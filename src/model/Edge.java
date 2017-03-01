@@ -16,6 +16,14 @@ public class Edge {
 	public void addCapacity(int capacity) {
 		this.capacity += capacity;
 	}
+	
+	public void clearCapacity(){
+		this.capacity = 0;
+	}
+	
+	public int getAvailableCapacity(){
+		return maxCapacity - capacity;
+	}
 
 	public int getCapacity() {
 		return this.capacity;
@@ -32,5 +40,7 @@ public class Edge {
 	public Node getEnd() {
 		return this.end;
 	}
+	
+	
 
 }
