@@ -10,6 +10,24 @@ public class Graph {
 	private HashMap<Integer, Node> nodes;
 	private List<Edge> edges;
 	private HashMap<Integer, List<Edge>> edgesForNode;
+	private Node startNode;
+	private Node endNode;
+
+	public Node getStartNode() {
+		return startNode;
+	}
+
+	public void setStartNode(Node startNode) {
+		this.startNode = startNode;
+	}
+
+	public Node getEndNode() {
+		return endNode;
+	}
+
+	public void setEndNode(Node endNode) {
+		this.endNode = endNode;
+	}
 
 	public Graph() {
 		nodes = new HashMap<>();
@@ -34,20 +52,18 @@ public class Graph {
 	}
 
 	public void addEdge(Node n1, Node n2, int maxCapacity) {
-		edges.add(new Edge(n1,n2, maxCapacity));
+		edges.add(new Edge(n1, n2, maxCapacity));
 	}
-	
-	public List<Edge> getEdgesForNode(Node n){
+
+	public List<Edge> getEdgesForNode(Node n) {
 		return edgesForNode.get(n.getId());
 	}
-	
-	public void calculateEdgesForNode(){
-		for(Node n : getNodes()){
-			List<Edge> edgesForN = edges
-										.stream()
-										.filter(x -> x.getStart().getId() == n.getId())
-										.collect(Collectors.toList());
-			edgesForNode.put(n.getId(),edgesForN) ;
+
+	public void calculateEdgesForNode() {
+		for (Node n : getNodes()) {
+			List<Edge> edgesForN = edges.stream().filter(x -> x.getStart().getId() == n.getId())
+					.collect(Collectors.toList());
+			edgesForNode.put(n.getId(), edgesForN);
 		}
 	}
 
