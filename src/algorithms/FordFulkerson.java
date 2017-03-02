@@ -3,6 +3,7 @@ package algorithms;
 import java.util.List;
 
 import model.Edge;
+import model.EdgePair;
 import model.Graph;
 
 public class FordFulkerson extends AbstractMaxFlowAlgorithm {
@@ -15,19 +16,18 @@ public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 	}
 	
 	@Override
-	public List<Edge> run() {
+	public List<EdgePair> run() {
 		init();
 		List<Edge> path; 
 		while((path = findNewFlowAugmentingPath()).size() > 0){
 			increaseFlow(path);
 		}
-		
-		assert(g.getEdges().stream().allMatch(x -> x.getCapacity() > 0));
-		return g.getEdges();
+		assert(g.getEdgePairs().stream().allMatch(x -> x.getCapacity() > 0));
+		return g.getEdgePairs();
 	}
 	
 	private void init(){
-		g.getEdges().stream().forEach(e -> e.clearCapacity());
+		g.getEdgePairs().stream().forEach(e -> e.clearCapacity());
 	}
 	
 	private List<Edge> findNewFlowAugmentingPath(){
@@ -41,7 +41,7 @@ public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 		path.stream().forEach(x -> x.addCapacity(minCapacity));
 	}
 	
-	public void printFlow(List<Edge> flow){
+	public void printFlow(List<EdgePair> flow){
 		System.out.println("Flow:");
 		flow.stream().forEach(x -> System.out.println(x.getCapacity()));
 		System.out.println("---------------");

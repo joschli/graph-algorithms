@@ -1,46 +1,37 @@
 package model;
 
 public class Edge {
-	private Node start;
-	private Node end;
-	private int maxCapacity;
-	private int capacity;
+	private Node n1;
+	private Node n2;
+	private boolean forward;
+	private EdgePair pair;
 
-	public Edge(Node start, Node end, int maxCapacity) {
-		this.start = start;
-		this.end = end;
-		this.maxCapacity = maxCapacity;
-		this.capacity = 0;
+	public Edge(Node start, Node end, boolean forward, EdgePair pair) {
+		this.n1 = start;
+		this.n2 = end;
+		this.forward = forward;
+		this.pair = pair;
 	}
 
 	public void addCapacity(int capacity) {
-		this.capacity += capacity;
+		pair.addCapacity(capacity, forward);
 	}
-	
-	public void clearCapacity(){
-		this.capacity = 0;
-	}
-	
+
 	public int getAvailableCapacity(){
-		return maxCapacity - capacity;
-	}
-
-	public int getCapacity() {
-		return this.capacity;
-	}
-
-	public int getMaxCapacity() {
-		return this.maxCapacity;
+		return pair.getAvailableCapacity(forward);
 	}
 
 	public Node getStart() {
-		return this.start;
+		return this.n1;
 	}
 
 	public Node getEnd() {
-		return this.end;
+		return this.n2;
 	}
 	
+	public boolean getDirection(){
+		return forward;
+	}
 	
 
 }

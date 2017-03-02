@@ -2,12 +2,11 @@ package algorithms;
 
 import java.util.List;
 
-import model.Edge;
-import model.Graph;
+import model.EdgePair;
 
 public abstract class AbstractMaxFlowAlgorithm {
 	
-	public abstract List<Edge> run();
+	public abstract List<EdgePair> run();
 
 	
 }
