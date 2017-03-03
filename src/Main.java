@@ -1,10 +1,13 @@
-package model;
 
 import java.util.Arrays;
 import java.util.List;
 
 import algorithms.EdmondsKarp;
 import algorithms.FordFulkerson;
+import model.Edge;
+import model.EdgePair;
+import model.Graph;
+import model.Node;
 import ui.MainFrame;
 
 public class Main {

@@ -12,21 +12,65 @@ import model.Node;
 
 public class GraphGenerator {
 
-	public GraphGenerator() {
+	private int width;
+	private int height;
+
+	public GraphGenerator(int width, int height) {
+		this.width = width;
+		this.height = height;
 	}
 
-	public Graph generateGraph(int nodeCount, int graphCapacity) {
-		Graph graph = new Graph();
+	public List<Graph> generateGraph(int nodeCount, int graphCapacity) {
+		List<Graph> graphs = new ArrayList<>();
+		graphs.add(new Graph());
+
 		List<Node> nodes = generateNodes(nodeCount);
+		for (Node n : nodes) {
+			lastGraph(graphs).addNode(n);
+		}
+
 		List<EdgePair> edges = generateEdges(nodes);
 		sortEdgesByDistance(edges);
+
+		EdgePair e = addEdge(lastGraph(graphs), edges);
+		while (e != null) {
+			Graph g = cloneGraph(lastGraph(graphs));
+			g.addEdgePair(e);
+			graphs.add(g);
+			e = addEdge(lastGraph(graphs), edges);
+		}
+
+		distributeCapacities(lastGraph(graphs));
+		return graphs;
+	}
+
+	private Graph lastGraph(List<Graph> graphs) {
+		return graphs.get(graphs.size() - 1);
+	}
+
+	private EdgePair addEdge(Graph graph, List<EdgePair> edges) {
+		EdgePair e = null;
 		for (EdgePair edge : edges) {
 			if (noIntersectionWithGraph(graph, edge)) {
-				graph.addEdgePair(edge);
+				e = edge;
+				break;
 			}
 		}
-		distributeCapacities(graph);
-		return graph;
+		if (e != null) {
+			edges.remove(e);
+		}
+		return e;
+	}
+
+	private Graph cloneGraph(Graph graph) {
+		Graph clone = new Graph();
+		for (Node n : graph.getNodes()) {
+			clone.addNode(n);
+		}
+		for (EdgePair e : graph.getEdgePairs()) {
+			clone.addEdgePair(e);
+		}
+		return clone;
 	}
 
 	private void distributeCapacities(Graph graph) {
@@ -37,11 +81,21 @@ public class GraphGenerator {
 		Line2D edgeLine = createLineFromEdge(edge);
 		for (EdgePair graphEdge : graph.getEdgePairs()) {
 			Line2D graphEdgeLine = createLineFromEdge(graphEdge);
-			if (edgeLine.intersectsLine(graphEdgeLine)) {
+			if (getStartPoint(edge) != getStartPoint(graphEdge) && getStartPoint(edge) != getEndPoint(graphEdge)
+					&& getEndPoint(edge) != getStartPoint(graphEdge) && getEndPoint(edge) != getEndPoint(graphEdge)
+					&& edgeLine.intersectsLine(graphEdgeLine)) {
 				return false;
 			}
 		}
 		return true;
+	}
+
+	private Point getStartPoint(EdgePair edge) {
+		return edge.getEdges().get(0).getStart().getPoint();
+	}
+
+	private Point getEndPoint(EdgePair edge) {
+		return edge.getEdges().get(0).getEnd().getPoint();
 	}
 
 	private Line2D createLineFromEdge(EdgePair edge) {
@@ -56,7 +110,7 @@ public class GraphGenerator {
 			public int compare(EdgePair arg0, EdgePair arg1) {
 				double dist1 = getDistance(arg0);
 				double dist2 = getDistance(arg1);
-				return dist1 > dist2 ? -1 : (dist1 < dist2) ? 1 : 0;
+				return dist1 < dist2 ? -1 : (dist1 > dist2) ? 1 : 0;
 			}
 
 		});
@@ -77,17 +131,17 @@ public class GraphGenerator {
 	private List<Node> generateNodes(int nodeCount) {
 		List<Node> nodes = new ArrayList<>();
 		for (int i = 0; i < nodeCount; i++) {
-			nodes.add(new Node(getRandomPointInRectangle(10, 20)));
+			nodes.add(new Node(getRandomPointInRectangle()));
 		}
 		return nodes;
 	}
 
-	private Point getRandomPointInRectangle(int width, int height) {
+	private Point getRandomPointInRectangle() {
 		return new Point(getRandomNumber(width), getRandomNumber(height));
 	}
 
 	private int getRandomNumber(int max) {
-		return (int) (Math.random() * max) + 1;
+		return (int) (Math.random() * max) + 10;
 	}
 
 	private double getDistance(EdgePair edge) {
