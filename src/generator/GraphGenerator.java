@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import model.Edge;
+import model.EdgePair;
 import model.Graph;
 import model.Node;
 
@@ -18,11 +18,11 @@ public class GraphGenerator {
 	public Graph generateGraph(int nodeCount, int graphCapacity) {
 		Graph graph = new Graph();
 		List<Node> nodes = generateNodes(nodeCount);
-		List<Edge> edges = generateEdges(nodes);
+		List<EdgePair> edges = generateEdges(nodes);
 		sortEdgesByDistance(edges);
-		for (Edge edge : edges) {
+		for (EdgePair edge : edges) {
 			if (noIntersectionWithGraph(graph, edge)) {
-				graph.addEdge(edge);
+				graph.addEdgePair(edge);
 			}
 		}
 		distributeCapacities(graph);
@@ -33,9 +33,9 @@ public class GraphGenerator {
 		// TODO set start/end and distribute capacity
 	}
 
-	private boolean noIntersectionWithGraph(Graph graph, Edge edge) {
+	private boolean noIntersectionWithGraph(Graph graph, EdgePair edge) {
 		Line2D edgeLine = createLineFromEdge(edge);
-		for (Edge graphEdge : graph.getEdges()) {
+		for (EdgePair graphEdge : graph.getEdgePairs()) {
 			Line2D graphEdgeLine = createLineFromEdge(graphEdge);
 			if (edgeLine.intersectsLine(graphEdgeLine)) {
 				return false;
@@ -44,15 +44,16 @@ public class GraphGenerator {
 		return true;
 	}
 
-	private Line2D createLineFromEdge(Edge edge) {
-		return new Line2D.Double(edge.getStart().getPoint(), edge.getEnd().getPoint());
+	private Line2D createLineFromEdge(EdgePair edge) {
+		return new Line2D.Double(edge.getEdges().get(0).getStart().getPoint(),
+				edge.getEdges().get(0).getEnd().getPoint());
 	}
 
-	private void sortEdgesByDistance(List<Edge> edges) {
-		edges.sort(new Comparator<Edge>() {
+	private void sortEdgesByDistance(List<EdgePair> edges) {
+		edges.sort(new Comparator<EdgePair>() {
 
 			@Override
-			public int compare(Edge arg0, Edge arg1) {
+			public int compare(EdgePair arg0, EdgePair arg1) {
 				double dist1 = getDistance(arg0);
 				double dist2 = getDistance(arg1);
 				return dist1 > dist2 ? -1 : (dist1 < dist2) ? 1 : 0;
@@ -61,12 +62,12 @@ public class GraphGenerator {
 		});
 	}
 
-	private List<Edge> generateEdges(List<Node> nodes) {
-		List<Edge> edges = new ArrayList<>();
+	private List<EdgePair> generateEdges(List<Node> nodes) {
+		List<EdgePair> edges = new ArrayList<>();
 		for (int i = 0; i < nodes.size(); i++) {
 			for (int j = 0; j < nodes.size(); j++) {
 				if (j != i) {
-					edges.add(new Edge(nodes.get(i), nodes.get(j), 0));
+					edges.add(new EdgePair(nodes.get(i), nodes.get(j), 0));
 				}
 			}
 		}
@@ -89,8 +90,8 @@ public class GraphGenerator {
 		return (int) (Math.random() * max) + 1;
 	}
 
-	private double getDistance(Edge edge) {
-		return edge.getStart().getPoint().distance(edge.getEnd().getPoint());
+	private double getDistance(EdgePair edge) {
+		return edge.getEdges().get(0).getStart().getPoint().distance(edge.getEdges().get(0).getEnd().getPoint());
 	}
 
 }
