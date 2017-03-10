@@ -6,25 +6,25 @@ import java.util.List;
 import java.util.Stack;
 
 import model.Edge;
-import model.Graph;
 import model.Node;
 
-public class DFS {
-	private Graph graph;
+public class DFSForDinic {
+
+	private SimpleGraph graph;
+
 	private Stack<Node> s;
 	private HashMap<Integer, Boolean> visited;
 	private HashMap<Integer, Integer> currentArc;
 	private List<Edge> path;
-	private List<Integer> availableCapacity;
+	private List<Integer> availableCapacity; 
 	
-	
-	public DFS(Graph graph){
-		this.graph = graph;
+	public DFSForDinic(SimpleGraph g){
+		this.graph = g;
 	}
 	
-	public List<Edge> run(){
+	public List<Edge> runDinic(){
 		init();
-		iterate();
+		iterateDinic();
 		return path;
 	}
 	
@@ -41,7 +41,7 @@ public class DFS {
 		visited.put(graph.getStartNode().getId(), true);
 	}
 	
-	private void iterate(){	
+	private void iterateDinic(){
 		while(!isVisited(graph.getEndNode()) && !s.isEmpty()){
 			Node v = s.peek();
 			if(getCurrentArc(v) == null){
@@ -49,6 +49,9 @@ public class DFS {
 				if(v.getId() != graph.getStartNode().getId()){
 					path.remove(path.size()-1);
 					availableCapacity.remove(availableCapacity.size()-1);
+					graph.removeNode(v);
+				}else{
+					return;
 				}
 			}else if(isVisited(getCurrentArc(v).getEnd()) || getCurrentArc(v).getAvailableCapacity() == 0){
 				increaseCurrentArc(v);
@@ -62,7 +65,6 @@ public class DFS {
 	}
 	
 	private boolean isVisited(Node n){
-		
 		return visited.get(n.getId());
 	}
 	
@@ -82,8 +84,4 @@ public class DFS {
 	public int getAvailableCapacity(){
 		return availableCapacity.get(availableCapacity.size()-1);
 	}
-
-	
-	
-	
 }

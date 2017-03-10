@@ -14,6 +14,9 @@ public class Graph {
 	private Node endNode;
 
 	public Node getStartNode() {
+		if(startNode == null){
+			return getNodes().get(0);
+		}
 		return startNode;
 	}
 
@@ -22,6 +25,9 @@ public class Graph {
 	}
 
 	public Node getEndNode() {
+		if(endNode == null){
+			return getNodes().get(getNodes().size()-1);
+		}
 		return endNode;
 	}
 
@@ -70,6 +76,12 @@ public class Graph {
 					.collect(Collectors.toList());
 			edgesForNode.put(n.getId(), edgesForN);
 		}
+	}
+	
+	public static void printFlow(List<EdgePair> flow){
+		System.out.println("Flow:");
+		flow.stream().forEach(x -> System.out.println(x.getCapacity()));
+		System.out.println("---------------");
 	}
 
 }
