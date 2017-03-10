@@ -18,12 +18,30 @@ public class Node {
 		this.pos = pos;
 	}
 
+	private Node(int id, Point pos) {
+		this.id = id;
+		this.pos = pos;
+	}
+
+	public Node clone() {
+		return new Node(this.id, this.pos);
+	}
+
 	public int getId() {
 		return id;
 	}
 
 	public Point getPoint() {
 		return pos;
+	}
+
+	public boolean equals(Object other) {
+		Node otherNode = (Node) other;
+		return otherNode.getId() == this.getId() && otherNode.getPoint().equals(this.getPoint());
+	}
+
+	public String toString() {
+		return "(" + this.id + ")";
 	}
 
 }

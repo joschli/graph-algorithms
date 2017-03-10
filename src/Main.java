@@ -2,11 +2,9 @@
 import java.util.Arrays;
 import java.util.List;
 
-import algorithms.EdmondsKarp;
-import algorithms.FordFulkerson;
-import model.Edge;
+import algorithms.Dinic;
 import model.EdgePair;
-import model.Graph;
+import model.Network;
 import model.Node;
 import ui.MainFrame;
 
@@ -28,29 +26,10 @@ public class Main {
 		EdgePair e7 = new EdgePair(n3, n5, 3);
 		EdgePair e8 = new EdgePair(n4, n5, 2);
 
-		Graph g = new Graph();
+		Network g = new Network();
 		Arrays.asList(e1, e2, e3, e4, e5, e6, e7, e8).stream().forEach(e -> g.addEdgePair(e));
 		Arrays.asList(n0, n1, n2, n3, n4, n5).stream().forEach(n -> g.addNode(n));
 		g.calculateEdgesForNode();
-		Graph g1 = g;
-
-		FordFulkerson f = new FordFulkerson(g);
-		List<EdgePair> flow = f.run();
-		f.printFlow(flow);
-
-		EdmondsKarp e = new EdmondsKarp(g1);
-		List<EdgePair> flow2 = e.run();
-		e.printFlow(flow2);
-
-		List<Edge> n0E = g.getEdgesForNode(n0);
-		List<Edge> n1E = g.getEdgesForNode(n1);
-
-		System.out.println("N0");
-		n0E.stream().forEach(
-				x -> System.out.println(x.getStart().getId() + " -> " + x.getEnd().getId() + " | " + x.getDirection()));
-		System.out.println("N1");
-		n1E.stream().forEach(
-				x -> System.out.println(x.getStart().getId() + " -> " + x.getEnd().getId() + " | " + x.getDirection()));
 
 		Node n6 = new Node();
 		Node n7 = new Node();
@@ -63,19 +42,22 @@ public class Main {
 		EdgePair e12 = new EdgePair(n7, n9, 1);
 		EdgePair e13 = new EdgePair(n8, n9, 1);
 
-		Graph g2 = new Graph();
+		Network g2 = new Network();
 		Arrays.asList(e9, e10, e11, e12, e13).stream().forEach(edge -> g2.addEdgePair(edge));
 		Arrays.asList(n6, n7, n8, n9).stream().forEach(n -> g2.addNode(n));
 		g2.calculateEdgesForNode();
-		Graph g3 = g2;
 
-		FordFulkerson f2 = new FordFulkerson(g2);
-		List<EdgePair> flow3 = f2.run();
-		f.printFlow(flow3);
+		/*
+		 * FordFulkerson f = new FordFulkerson(g); List<EdgePair> flow =
+		 * f.run(); f.printFlow(flow);
+		 * 
+		 * EdmondsKarp e = new EdmondsKarp(g1); List<EdgePair> flow2 = e.run();
+		 * e.printFlow(flow2);
+		 */
 
-		EdmondsKarp ed2 = new EdmondsKarp(g3);
-		List<EdgePair> flow4 = ed2.run();
-		e.printFlow(flow4);
+		Dinic d = new Dinic(g);
+		List<EdgePair> flow = d.run();
+		Network.printFlow(flow);
 
 		MainFrame frame = new MainFrame(800, 600);
 	}

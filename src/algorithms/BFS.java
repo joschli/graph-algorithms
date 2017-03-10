@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Set;
 
 import model.Edge;
-import model.Graph;
+import model.Network;
 import model.Node;
 
 public class BFS {
-	private Graph graph;
+	private Network graph;
 	private LinkedList<Node> s;
 	private HashMap<Integer, Boolean> visited;
 	private HashMap<Integer, Integer> currentArc;
@@ -24,7 +24,7 @@ public class BFS {
 	private HashMap<Integer, Set<Edge>> edgesForNode;
 	
 	
-	public BFS(Graph graph){
+	public BFS(Network graph){
 		this.graph = graph;
 	}
 	

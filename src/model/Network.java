@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Graph {
+public class Network {
 
 	private HashMap<Integer, Node> nodes;
 	private List<EdgePair> edges;
@@ -35,7 +35,7 @@ public class Graph {
 		this.endNode = endNode;
 	}
 
-	public Graph() {
+	public Network() {
 		nodes = new HashMap<>();
 		edges = new ArrayList<>();
 		edgesForNode = new HashMap<>();

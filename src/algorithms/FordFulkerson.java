@@ -4,14 +4,14 @@ import java.util.List;
 
 import model.Edge;
 import model.EdgePair;
-import model.Graph;
+import model.Network;
 
 public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 
-	private Graph g;
+	private Network g;
 	private int minCapacity;
 	
-	public FordFulkerson(Graph g){
+	public FordFulkerson(Network g){
 		this.g = g;
 	}
 	

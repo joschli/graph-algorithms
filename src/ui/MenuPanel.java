@@ -12,12 +12,24 @@ public class MenuPanel extends JPanel {
 
 	JFormattedTextField nodeCountField;
 	JFormattedTextField capacityField;
+	JButton nextButton;
+	JButton previousButton;
 
 	public MenuPanel(MainFrame parent) {
-		JButton button = new JButton("Generate");
-		button.setSize(100, 30);
-		button.setActionCommand("generate");
-		button.addActionListener(parent);
+		JButton generateButton = new JButton("Generate");
+		generateButton.setSize(100, 30);
+		generateButton.setActionCommand("generate");
+		generateButton.addActionListener(parent);
+		previousButton = new JButton("Previous");
+		previousButton.setSize(100, 30);
+		previousButton.setEnabled(false);
+		previousButton.setActionCommand("previous");
+		previousButton.addActionListener(parent);
+		nextButton = new JButton("Next");
+		nextButton.setSize(100, 30);
+		nextButton.setActionCommand("next");
+		nextButton.addActionListener(parent);
+
 		JLabel nodeCountLabel = new JLabel("Nodes:");
 		nodeCountField = new JFormattedTextField(NumberFormat.getIntegerInstance());
 		nodeCountField.setValue(new Long(5));
@@ -33,7 +45,9 @@ public class MenuPanel extends JPanel {
 		nodeCountPanel.add(capacityField);
 
 		this.add(nodeCountPanel);
-		this.add(button);
+		this.add(generateButton);
+		this.add(previousButton);
+		this.add(nextButton);
 		this.setMinimumSize(new Dimension((int) (0.2 * parent.getWidth()), parent.getHeight()));
 	}
 
@@ -43,6 +57,22 @@ public class MenuPanel extends JPanel {
 
 	public int getNodeCount() {
 		return ((Long) nodeCountField.getValue()).intValue();
+	}
+
+	public void disableNext() {
+		nextButton.setEnabled(false);
+	}
+
+	public void enablePrevious() {
+		previousButton.setEnabled(true);
+	}
+
+	public void enableNext() {
+		nextButton.setEnabled(true);
+	}
+
+	public void disablePrevious() {
+		previousButton.setEnabled(false);
 	}
 
 }

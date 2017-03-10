@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Stack;
 
 import model.Edge;
-import model.Graph;
+import model.Network;
 import model.Node;
 
 public class DFS {
-	private Graph graph;
+	private Network graph;
 	private Stack<Node> s;
 	private HashMap<Integer, Boolean> visited;
 	private HashMap<Integer, Integer> currentArc;
@@ -18,7 +18,7 @@ public class DFS {
 	private List<Integer> availableCapacity;
 	
 	
-	public DFS(Graph graph){
+	public DFS(Network graph){
 		this.graph = graph;
 	}
 	

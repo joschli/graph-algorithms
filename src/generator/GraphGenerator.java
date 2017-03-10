@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import model.EdgePair;
-import model.Graph;
+import model.Network;
 import model.Node;
 
 public class GraphGenerator {
@@ -20,9 +20,9 @@ public class GraphGenerator {
 		this.height = height;
 	}
 
-	public List<Graph> generateGraph(int nodeCount, int graphCapacity) {
-		List<Graph> graphs = new ArrayList<>();
-		graphs.add(new Graph());
+	public List<Network> generateGraph(int nodeCount, int graphCapacity) {
+		List<Network> graphs = new ArrayList<>();
+		graphs.add(new Network());
 
 		List<Node> nodes = generateNodes(nodeCount);
 		for (Node n : nodes) {
@@ -34,7 +34,7 @@ public class GraphGenerator {
 
 		EdgePair e = addEdge(lastGraph(graphs), edges);
 		while (e != null) {
-			Graph g = cloneGraph(lastGraph(graphs));
+			Network g = cloneGraph(lastGraph(graphs));
 			g.addEdgePair(e);
 			graphs.add(g);
 			e = addEdge(lastGraph(graphs), edges);
@@ -44,11 +44,11 @@ public class GraphGenerator {
 		return graphs;
 	}
 
-	private Graph lastGraph(List<Graph> graphs) {
+	private Network lastGraph(List<Network> graphs) {
 		return graphs.get(graphs.size() - 1);
 	}
 
-	private EdgePair addEdge(Graph graph, List<EdgePair> edges) {
+	private EdgePair addEdge(Network graph, List<EdgePair> edges) {
 		EdgePair e = null;
 		for (EdgePair edge : edges) {
 			if (noIntersectionWithGraph(graph, edge)) {
@@ -62,8 +62,8 @@ public class GraphGenerator {
 		return e;
 	}
 
-	private Graph cloneGraph(Graph graph) {
-		Graph clone = new Graph();
+	private Network cloneGraph(Network graph) {
+		Network clone = new Network();
 		for (Node n : graph.getNodes()) {
 			clone.addNode(n);
 		}
@@ -73,11 +73,11 @@ public class GraphGenerator {
 		return clone;
 	}
 
-	private void distributeCapacities(Graph graph) {
+	private void distributeCapacities(Network graph) {
 		// TODO set start/end and distribute capacity
 	}
 
-	private boolean noIntersectionWithGraph(Graph graph, EdgePair edge) {
+	private boolean noIntersectionWithGraph(Network graph, EdgePair edge) {
 		Line2D edgeLine = createLineFromEdge(edge);
 		for (EdgePair graphEdge : graph.getEdgePairs()) {
 			Line2D graphEdgeLine = createLineFromEdge(graphEdge);
@@ -120,9 +120,14 @@ public class GraphGenerator {
 		List<EdgePair> edges = new ArrayList<>();
 		for (int i = 0; i < nodes.size(); i++) {
 			for (int j = 0; j < nodes.size(); j++) {
-				if (j != i) {
-					edges.add(new EdgePair(nodes.get(i), nodes.get(j), 0));
+				if (j == i) {
+					continue;
 				}
+				EdgePair newEdge = new EdgePair(nodes.get(i), nodes.get(j), 0);
+				if (edges.contains(newEdge)) {
+					continue;
+				}
+				edges.add(newEdge);
 			}
 		}
 		return edges;
@@ -131,7 +136,23 @@ public class GraphGenerator {
 	private List<Node> generateNodes(int nodeCount) {
 		List<Node> nodes = new ArrayList<>();
 		for (int i = 0; i < nodeCount; i++) {
-			nodes.add(new Node(getRandomPointInRectangle()));
+			Node newNode = new Node(getRandomPointInRectangle());
+			boolean goodPosition = false;
+			while (!goodPosition) {
+				for (Node n : nodes) {
+					if (n.getPoint().distance(newNode.getPoint()) < 80) {
+						goodPosition = false;
+						break;
+					}
+					goodPosition = true;
+				}
+				if (goodPosition || nodes.isEmpty()) {
+					nodes.add(newNode);
+					break;
+				} else {
+					newNode = new Node(getRandomPointInRectangle());
+				}
+			}
 		}
 		return nodes;
 	}
@@ -141,7 +162,7 @@ public class GraphGenerator {
 	}
 
 	private int getRandomNumber(int max) {
-		return (int) (Math.random() * max) + 10;
+		return (int) (Math.random() * (max - 100)) + 100;
 	}
 
 	private double getDistance(EdgePair edge) {
