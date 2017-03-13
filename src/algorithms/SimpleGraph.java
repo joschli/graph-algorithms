@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import model.Edge;
-import model.Graph;
+import model.Network;
 import model.Node;
 
-
-public class SimpleGraph extends Graph{
+public class SimpleGraph extends Network {
 	public List<Edge> edges;
 	public Set<Node> nodes;
 	public HashMap<Integer, List<Edge>> edgesForNode;
@@ -23,15 +22,13 @@ public class SimpleGraph extends Graph{
 		this.setStartNode(start);
 		this.setEndNode(end);
 		nodes = new HashSet<Node>();
-		edgesForNode = new HashMap<Integer,List<Edge>>();
+		edgesForNode = new HashMap<Integer, List<Edge>>();
 		edgesToNode = new HashMap<Integer, List<Edge>>();
 		calculateEdgesForNodes();
 	}
-	
-	private void calculateEdgesForNodes(){
-		edges
-		.stream()
-		.forEach((x) -> {
+
+	private void calculateEdgesForNodes() {
+		edges.stream().forEach((x) -> {
 			nodes.add(x.getStart());
 			nodes.add(x.getEnd());
 			if(x.getStart().getId() > highIdx){
@@ -48,20 +45,20 @@ public class SimpleGraph extends Graph{
 			edgesToNode.put(x.getEnd().getId(), e2);
 		});
 	}
-	
-	public void removeEdge(Edge e){
+
+	public void removeEdge(Edge e) {
 		edges.remove(e);
 		edgesForNode.get(e.getStart().getId()).remove(e);
 		edgesToNode.get(e.getEnd().getId()).remove(e);
 	}
-	
-	public void removeNode(Node n){
+
+	public void removeNode(Node n) {
 		System.out.println("REMOVING NODE: n" + n.getId());
 		nodes.remove(n);
 		edgesForNode.get(n.getId()).stream().forEach(x -> removeEdge(x));
 		edgesToNode.get(n.getId()).stream().forEach(x -> removeEdge(x));
 	}
-	
+
 	@Override
 	public int getHighestIndex() {return highIdx;};
 	
@@ -69,9 +66,9 @@ public class SimpleGraph extends Graph{
 	public List<Node> getNodes(){
 		return new ArrayList<Node>(nodes);
 	}
-	
+
 	@Override
-	public List<Edge> getEdgesForNode(Node n){
+	public List<Edge> getEdgesForNode(Node n) {
 		return edgesForNode.get(n.getId());
 	}
 

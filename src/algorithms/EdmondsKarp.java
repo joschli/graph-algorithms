@@ -4,13 +4,13 @@ import java.util.List;
 
 import model.Edge;
 import model.EdgePair;
-import model.Graph;
+import model.Network;
 
 public class EdmondsKarp extends AbstractMaxFlowAlgorithm {
-	private Graph g;
+	private Network g;
 	private int minCapacity;
 	
-	public EdmondsKarp(Graph g){
+	public EdmondsKarp(Network g){
 		this.g = g;
 	}
 	

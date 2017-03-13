@@ -6,12 +6,10 @@ import java.util.Queue;
 
 import model.Edge;
 import model.EdgePair;
-import model.Graph;
 import model.Node;
+import model.Network;
 
 public class PreflowPush extends AbstractMaxFlowAlgorithm {
-
-	private Graph graph;
 
   private int[] currentArc;
   private int[] d;
@@ -19,10 +17,12 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 
   private LinkedList<Node> s;
   
-	public PreflowPush(Graph g){
-		this.graph = g; 
+	private Network graph;
+
+	public PreflowPush(Network g) {
+		this.graph = g;
 	}
-	
+
 	@Override
 	public List<EdgePair> run() {
 		init();

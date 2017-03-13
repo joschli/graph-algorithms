@@ -4,11 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import model.Edge;
-import model.Graph;
+import model.Network;
 import model.Node;
 
 public class DFS {
-	private Graph graph;
+  
+	private Network graph;
 	private LinkedList<Node> s;
 	private boolean[] visited;
 	private int[] currentArc;
@@ -16,7 +17,7 @@ public class DFS {
 	private LinkedList<Integer> availableCapacity;
 	
 	
-	public DFS(Graph graph){
+	public DFS(Network graph){
 		this.graph = graph;
 	}
 	

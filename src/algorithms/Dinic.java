@@ -4,42 +4,42 @@ import java.util.List;
 
 import model.Edge;
 import model.EdgePair;
-import model.Graph;
+import model.Network;
 
 public class Dinic extends AbstractMaxFlowAlgorithm {
 
-	private Graph g;
-	
-	public Dinic(Graph g){
-		this.g = g; 
+	private Network g;
+
+	public Dinic(Network g) {
+		this.g = g;
 	}
+
 	@Override
 	public List<EdgePair> run() {
 		init();
 		List<Edge> subgraph;
-		while((subgraph = findSubgraph()).size() != 0){
+		while ((subgraph = findSubgraph()).size() != 0) {
 			createAndAddBlockingFlow(subgraph);
 		}
 		return g.getEdgePairs();
 	}
-	
-	private void init(){
+
+	private void init() {
 		g.getEdgePairs().stream().forEach(e -> e.clearCapacity());
 	}
-	
-	private List<Edge> findSubgraph(){
+
+	private List<Edge> findSubgraph() {
 		BFS bfs = new BFS(g);
 		return bfs.runDinic();
 	}
-	
 	// O(m*n) => m iterationen (Anzahl Edges, dajedes mal edges weniger werden) Dfs O(n) mit Nodebedingung
 	private void createAndAddBlockingFlow(List<Edge> subGraph){
 	  //TODO KOMPLEXITÄT?
 		SimpleGraph sg = new SimpleGraph(subGraph, g.getStartNode(), g.getEndNode());
-		while(true){
+		while (true) {
 			DFSForDinic dfs = new DFSForDinic(sg);
 			List<Edge> path = dfs.runDinic();
-			if(path.size() == 0){
+			if (path.size() == 0) {
 				break;
 			}
 			int minCapacity = dfs.getAvailableCapacity();
@@ -48,8 +48,7 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 				sg.removeEdge(x);
 			});
 		}
-		
+
 	}
 
-	
 }

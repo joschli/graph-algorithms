@@ -3,21 +3,20 @@ package algorithms;
 import java.util.LinkedList;
 
 import model.Edge;
-import model.Graph;
+import model.Network;
 import model.Node;
 
 public class BFSPreflowPush {
   
   private int[] distance;
   
-  private Graph graph;
+  private Network graph;
   private LinkedList<Node> s;
   private boolean[] visited;
   private int[] currentArc;
   private Node start;
   
-  public BFSPreflowPush(Graph g, Node start){
-    System.out.println("Distances");
+  public BFSPreflowPush(Network g, Node start){
     this.graph = g;
     this.start = start;
   }

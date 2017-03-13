@@ -32,7 +32,7 @@ public class Main {
 		EdgePair e7 = new EdgePair(n3, n5, 3);
 		EdgePair e8 = new EdgePair(n4, n5, 2);
 
-		Graph g = new Graph();
+		Network g = new Network();
 		Arrays.asList(e1, e2, e3, e4, e5, e6, e7, e8).stream().forEach(e -> g.addEdgePair(e));
 		Arrays.asList(n0, n1, n2, n3, n4, n5).stream().forEach(n -> g.addNode(n));
 		g.calculateEdgesForNode();
@@ -49,7 +49,7 @@ public class Main {
 		EdgePair e12 = new EdgePair(n7, n9, 1);
 		EdgePair e13 = new EdgePair(n8, n9, 1);
 
-		Graph g2 = new Graph();
+		Network g2 = new Network();
 		Arrays.asList(e9, e10, e11, e12, e13).stream().forEach(edge -> g2.addEdgePair(edge));
 		Arrays.asList(n6, n7, n8, n9).stream().forEach(n -> g2.addNode(n));
 		g2.calculateEdgesForNode();

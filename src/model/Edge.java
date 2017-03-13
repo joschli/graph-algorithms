@@ -17,7 +17,7 @@ public class Edge {
 		pair.addCapacity(capacity, forward);
 	}
 
-	public int getAvailableCapacity(){
+	public int getAvailableCapacity() {
 		return pair.getAvailableCapacity(forward);
 	}
 
@@ -28,10 +28,20 @@ public class Edge {
 	public Node getEnd() {
 		return this.n2;
 	}
-	
-	public boolean getDirection(){
+
+	public boolean getDirection() {
 		return forward;
 	}
-	
+
+	@Override
+	public boolean equals(Object other) {
+		Edge otherEdge = (Edge) other;
+		return otherEdge.getStart().equals(this.getStart()) && otherEdge.getEnd().equals(this.getEnd());
+	}
+
+	@Override
+	public String toString() {
+		return getAvailableCapacity() + "|" + pair.getCapacity();
+	}
 
 }
