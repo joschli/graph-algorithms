@@ -34,6 +34,7 @@ import model.Node;
 public class MainFrame implements ActionListener {
 
 	MenuPanel menuPanel;
+	ModeSelection modeSelection;
 	Layout<Node, Edge> layout;
 	BasicVisualizationServer<Node, Edge> graphPanel;
 	Graph<Node, Edge> graph;
@@ -57,11 +58,8 @@ public class MainFrame implements ActionListener {
 		this.viewPortHeight = (int) this.height / 2;
 		result = new ArrayList<>();
 		setupFrame();
-
-		addMenu();
-		addGraphPanel();
-		index = networks.size() - 1;
-		showGraph();
+		modeSelection = new ModeSelection(this);
+		this.frame.add(modeSelection);
 
 		frame.pack();
 		frame.setVisible(true);
@@ -228,6 +226,18 @@ public class MainFrame implements ActionListener {
 			timer.cancel();
 			menuPanel.enableStart();
 			menuPanel.disablePause();
+		case "mode":
+			String mode = modeSelection.getMode();
+			if (mode == "run") {
+				addMenu();
+				addGraphPanel();
+				index = networks.size() - 1;
+				showGraph();
+			} else if (mode == "test") {
+				System.exit(0);
+			}
+			this.frame.remove(modeSelection);
+			this.frame.pack();
 		default:
 			break;
 		}
