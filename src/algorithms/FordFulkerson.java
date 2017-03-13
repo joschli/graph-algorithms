@@ -39,11 +39,5 @@ public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 	private void increaseFlow(List<Edge> path){
 		path.stream().forEach(x -> x.addCapacity(minCapacity));
 	}
-	
-	public void printFlow(List<EdgePair> flow){
-		
-	}
-	
-	
-	
+
 }

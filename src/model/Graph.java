@@ -9,9 +9,11 @@ public class Graph {
 
 	private HashMap<Integer, Node> nodes;
 	private List<EdgePair> edges;
-	private HashMap<Integer, List<Edge>> edgesForNode;
+	private List<Edge> realEdges;
+	private List<List<Edge>> edgesForNode;
 	private Node startNode;
 	private Node endNode;
+	private int highestIdx = 0;
 
 	public Node getStartNode() {
 		if(startNode == null){
@@ -38,10 +40,12 @@ public class Graph {
 	public Graph() {
 		nodes = new HashMap<>();
 		edges = new ArrayList<>();
-		edgesForNode = new HashMap<>();
 	}
 
 	public void addNode(Node n) {
+	  if(n.getId() > highestIdx){
+	    highestIdx = n.getId();
+	  }
 		nodes.put(n.getId(), n);
 	}
 
@@ -60,13 +64,26 @@ public class Graph {
 	public void addEdgePair(Node n1, Node n2, int maxCapacity) {
 		edges.add(new EdgePair(n1, n2, maxCapacity));
 	}
+	
+	public List<Edge> getRealEdges(){
+	  return realEdges;
+	}
 
 	public List<Edge> getEdgesForNode(Node n) {
 		return edgesForNode.get(n.getId());
 	}
 
+	private void calculateRealEdges(){
+	  realEdges = edges.stream().map(x -> x.getEdges()).flatMap(x -> x.stream()).collect(Collectors.toList());
+	}
 
 	public void calculateEdgesForNode() {
+	  calculateRealEdges();
+    edgesForNode = new ArrayList<List<Edge>>(getHighestIndex());
+    for(int i = 0; i < getHighestIndex()+1; i++){
+      edgesForNode.add(new ArrayList<Edge>());
+    }
+    
 		for (Node n : getNodes()) {
 			List<Edge> edgesForN = edges
 					.stream()
@@ -74,7 +91,7 @@ public class Graph {
 					.flatMap(x -> x.stream())
 					.filter(x -> x.getStart().getId() == n.getId())
 					.collect(Collectors.toList());
-			edgesForNode.put(n.getId(), edgesForN);
+			edgesForNode.add(n.getId(), edgesForN);
 		}
 	}
 	
@@ -82,6 +99,10 @@ public class Graph {
 		System.out.println("Flow:");
 		flow.stream().forEach(x -> System.out.println(x.getCapacity()));
 		System.out.println("---------------");
+	}
+	
+	public int getHighestIndex(){
+	  return highestIdx;
 	}
 
 }

@@ -1,9 +1,7 @@
 package algorithms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import model.Edge;
 import model.Node;
@@ -12,11 +10,11 @@ public class DFSForDinic {
 
 	private SimpleGraph graph;
 
-	private Stack<Node> s;
-	private HashMap<Integer, Boolean> visited;
-	private HashMap<Integer, Integer> currentArc;
-	private List<Edge> path;
-	private List<Integer> availableCapacity; 
+	private LinkedList<Node> s;
+	private boolean[] visited;
+	private int[] currentArc;
+	private LinkedList<Edge> path;
+	private LinkedList<Integer> availableCapacity; 
 	
 	public DFSForDinic(SimpleGraph g){
 		this.graph = g;
@@ -29,16 +27,16 @@ public class DFSForDinic {
 	}
 	
 	private void init(){
-		s = new Stack<Node>();
-		availableCapacity = new ArrayList<Integer>();
-		path = new ArrayList<Edge>();
-		visited = new HashMap<>();
-		currentArc = new HashMap<>();
+		s = new LinkedList<Node>();
+		availableCapacity = new LinkedList<Integer>();
+		path = new LinkedList<Edge>();
+		visited = new boolean[graph.getHighestIndex()+1];
+		currentArc = new int[graph.getHighestIndex()+1];
 		
-		s.add(graph.getStartNode());
-		availableCapacity.add(Integer.MAX_VALUE);
-		graph.getNodes().stream().forEach(x -> {visited.put(x.getId(), false); currentArc.put(x.getId(), 0);});
-		visited.put(graph.getStartNode().getId(), true);
+		s.addFirst(graph.getStartNode());
+		availableCapacity.addFirst(Integer.MAX_VALUE);
+		graph.getNodes().stream().forEach(x -> {visited[x.getId()] = false; currentArc[x.getId()] = 0;});
+		visited[graph.getStartNode().getId()] = true;
 	}
 	
 	private void iterateDinic(){
@@ -47,8 +45,8 @@ public class DFSForDinic {
 			if(getCurrentArc(v) == null){
 				s.pop();
 				if(v.getId() != graph.getStartNode().getId()){
-					path.remove(path.size()-1);
-					availableCapacity.remove(availableCapacity.size()-1);
+					path.pop();
+					availableCapacity.pop();
 					graph.removeNode(v);
 				}else{
 					return;
@@ -56,32 +54,31 @@ public class DFSForDinic {
 			}else if(isVisited(getCurrentArc(v).getEnd()) || getCurrentArc(v).getAvailableCapacity() == 0){
 				increaseCurrentArc(v);
 			}else{
-				path.add(getCurrentArc(v));
-				availableCapacity.add(Math.min(availableCapacity.get(availableCapacity.size()-1), getCurrentArc(v).getAvailableCapacity()));
-				visited.put(getCurrentArc(v).getEnd().getId(), true);
-				s.push(getCurrentArc(v).getEnd());
+			  path.addFirst(getCurrentArc(v));
+        availableCapacity.addFirst(Math.min(availableCapacity.peek(), getCurrentArc(v).getAvailableCapacity()));
+				visited[getCurrentArc(v).getEnd().getId()] = true;
+				s.addFirst(getCurrentArc(v).getEnd());
 			}
 		}
 	}
 	
 	private boolean isVisited(Node n){
-		return visited.get(n.getId());
+		return visited[n.getId()];
 	}
 	
 	private Edge getCurrentArc(Node n){
-		if(graph.getEdgesForNode(n).size() > currentArc.get(n.getId())){
-			return graph.getEdgesForNode(n).get(currentArc.get(n.getId()));
+		if(graph.getEdgesForNode(n).size() > currentArc[n.getId()]){
+			return graph.getEdgesForNode(n).get(currentArc[n.getId()]);
 		}else{
 			return null;
 		}
 	}
-	
 
-	private void increaseCurrentArc(Node n){
-		currentArc.put(n.getId(), currentArc.get(n.getId())+1);
-	}
-	
+  private void increaseCurrentArc(Node n){
+    currentArc[n.getId()] = currentArc[n.getId()] +1;
+  }
+  
 	public int getAvailableCapacity(){
-		return availableCapacity.get(availableCapacity.size()-1);
+		return availableCapacity.peek();
 	}
 }

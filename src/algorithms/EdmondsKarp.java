@@ -21,8 +21,6 @@ public class EdmondsKarp extends AbstractMaxFlowAlgorithm {
 		while((path = findNewFlowAugmentingPath()).size() > 0){
 			increaseFlow(path);
 		}
-		
-		assert(g.getEdgePairs().stream().allMatch(x -> x.getCapacity() > 0));
 		return g.getEdgePairs();
 	}
 	
@@ -40,10 +38,5 @@ public class EdmondsKarp extends AbstractMaxFlowAlgorithm {
 	private void increaseFlow(List<Edge> path){
 		path.stream().forEach(x -> x.addCapacity(minCapacity));
 	}
-	
-	public void printFlow(List<EdgePair> flow){
-		System.out.println("Flow:");
-		flow.stream().forEach(x -> System.out.println(x.getCapacity()));
-		System.out.println("---------------");
-	}
+
 }

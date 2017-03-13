@@ -16,6 +16,7 @@ public class SimpleGraph extends Graph{
 	public Set<Node> nodes;
 	public HashMap<Integer, List<Edge>> edgesForNode;
 	public HashMap<Integer, List<Edge>> edgesToNode;
+	public int highIdx = 0;
 	
 	public SimpleGraph (List<Edge> e, Node start, Node end){
 		this.edges = new ArrayList<Edge>(e);
@@ -33,6 +34,12 @@ public class SimpleGraph extends Graph{
 		.forEach((x) -> {
 			nodes.add(x.getStart());
 			nodes.add(x.getEnd());
+			if(x.getStart().getId() > highIdx){
+			  highIdx = x.getStart().getId();
+			}
+			if(x.getEnd().getId() > highIdx){
+			  highIdx = x.getEnd().getId();
+			}
 			List<Edge> e = edgesForNode.getOrDefault(x.getStart().getId(), new ArrayList<Edge>());
 			e.add(x);
 			edgesForNode.put(x.getStart().getId(), e);
@@ -54,6 +61,9 @@ public class SimpleGraph extends Graph{
 		edgesForNode.get(n.getId()).stream().forEach(x -> removeEdge(x));
 		edgesToNode.get(n.getId()).stream().forEach(x -> removeEdge(x));
 	}
+	
+	@Override
+	public int getHighestIndex() {return highIdx;};
 	
 	@Override
 	public List<Node> getNodes(){

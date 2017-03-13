@@ -7,6 +7,7 @@ import algorithms.Dinic;
 import algorithms.EdmondsKarp;
 import algorithms.SimpleGraph;
 import algorithms.FordFulkerson;
+import algorithms.PreflowPush;
 import ui.MainFrame;
 
 public class Main {
@@ -14,6 +15,7 @@ public class Main {
 
 	
 	public static void main(String[] args) {
+	  
 		Node n0 = new Node();
 		Node n1 = new Node();
 		Node n2 = new Node();
@@ -21,7 +23,7 @@ public class Main {
 		Node n4 = new Node();
 		Node n5 = new Node();
 
-		EdgePair e1 = new EdgePair(n0, n1, 10);
+		EdgePair e1 = new EdgePair(n0, n1, 3);
 		EdgePair e2 = new EdgePair(n0, n2, 3);
 		EdgePair e3 = new EdgePair(n2, n1, 2);
 		EdgePair e4 = new EdgePair(n1, n3, 2);
@@ -55,17 +57,20 @@ public class Main {
 		
 		/*FordFulkerson f = new FordFulkerson(g);
 		List<EdgePair> flow = f.run();
-		f.printFlow(flow);
+		Graph.printFlow(flow);
+		*/
+		EdmondsKarp e = new EdmondsKarp(g);
+		List<EdgePair> flow = e.run();
+		g.printFlow(flow);
 		
-		EdmondsKarp e = new EdmondsKarp(g1);
-		List<EdgePair> flow2 = e.run();
-		e.printFlow(flow2);*/
-
-		Dinic d = new Dinic(g);
+		/*Dinic d = new Dinic(g);
 		List<EdgePair> flow = d.run();
 		Graph.printFlow(flow);
+		
+		/*PreflowPush p = new PreflowPush(g);
+		List<EdgePair> flow = p.run();
+		Graph.printFlow(flow);*/
 
-		MainFrame frame = new MainFrame(800, 600);
 	}
 	
 	

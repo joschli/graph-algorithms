@@ -14,14 +14,15 @@ import model.Node;
 public class BFS {
 	private Graph graph;
 	private LinkedList<Node> s;
-	private HashMap<Integer, Boolean> visited;
-	private HashMap<Integer, Integer> currentArc;
-	private HashMap<Integer,Integer> availableCapacity; 
-	private HashMap<Integer,List<Edge>> pathToNode;
+	private boolean[] visited;
+	private int[] currentArc;
+	private int[] availableCapacity; 
+	private LinkedList<Edge>[] pathToNode;
 	
 	//DINIC SPEZIELL
-	private HashMap<Integer, Integer> level;
-	private HashMap<Integer, Set<Edge>> edgesForNode;
+	private int[] level;
+	//Jede Node gibt an welche Edges sie hat => edgesForNode[3][4][5] == true => Node 3 hat Edge von Node 4 zu Node 5
+	private LinkedList<Edge>[] edgesForNode;
 	
 	
 	public BFS(Graph graph){
@@ -29,24 +30,24 @@ public class BFS {
 	}
 	
 	private boolean isVisited(Node n){
-		return visited.get(n.getId());
+		return visited[n.getId()];
 	}
 	
 	private void setVisited(Node n){
-		visited.put(n.getId(), true);
+		visited[n.getId()] = true;
 	}
 	
 	private Edge getCurrentArc(Node n){
-		if(graph.getEdgesForNode(n).size() > currentArc.get(n.getId())){
-			return graph.getEdgesForNode(n).get(currentArc.get(n.getId()));
+		if(graph.getEdgesForNode(n).size() > currentArc[n.getId()]){
+			return graph.getEdgesForNode(n).get(currentArc[n.getId()]);
 		}else{
 			return null;
 		}	
 	}
 
-	private void increaseCurrentArc(Node n){
-		currentArc.put(n.getId(), currentArc.get(n.getId())+1);
-	}
+ private void increaseCurrentArc(Node n){
+	    currentArc[n.getId()] = currentArc[n.getId()] +1;
+ }
 	
 	  //////////////////////////////////////////////////////////////////////////////////
 	 //								Edmons-Karps 									 //
@@ -55,63 +56,63 @@ public class BFS {
 	public List<Edge> run(){
 		init();
 		iterate();
-		return pathToNode.getOrDefault(graph.getNodes().get(graph.getNodes().size()-1).getId(), new ArrayList<>());
+		return pathToNode[graph.getEndNode().getId()];
 	}
 	
 	private void init(){
 		s = new LinkedList<Node>();
-		availableCapacity = new HashMap<>();
-		pathToNode = new HashMap<>();
-		visited = new HashMap<>();
-		currentArc = new HashMap<>();
+		availableCapacity = new int[graph.getHighestIndex()+1];
+		pathToNode = new LinkedList[graph.getHighestIndex()+1];
+		visited = new boolean[graph.getHighestIndex()+1];
+		currentArc = new int[graph.getHighestIndex()+1];
 		
-		edgesForNode = new HashMap<>();
-		level = new HashMap<>();
-		level.put(graph.getStartNode().getId(), 0);
+		edgesForNode = new LinkedList[graph.getHighestIndex()];
+		level = new int[graph.getHighestIndex()+1];
 		
 
-		s.add(graph.getStartNode());
-		availableCapacity.put(graph.getStartNode().getId(), Integer.MAX_VALUE);
+		s.addLast(graph.getStartNode());
+		availableCapacity[graph.getStartNode().getId()] = Integer.MAX_VALUE;
 		graph.getNodes()
 				.stream()
 				.forEach(x -> {
-					visited.put(x.getId(), false);
-					currentArc.put(x.getId(), 0);
-					edgesForNode.put(x.getId(), new HashSet<Edge>());});
-		visited.put(graph.getStartNode().getId(), true);
+					visited[x.getId()] = false;
+					currentArc[x.getId()] = 0;
+					level[x.getId()] = Integer.MAX_VALUE;
+					pathToNode[x.getId()] = new LinkedList<Edge>();});
+		visited[graph.getStartNode().getId()] = true;
+    level[graph.getStartNode().getId()] = 0;
 	}
 	
 	private void iterate(){	
 		while(!isVisited(graph.getEndNode()) && !s.isEmpty()){
-			Node v = s.peek();
+		  Node v = s.peek();
 			if(getCurrentArc(v) == null){
 				s.pop();
 			}else if(isVisited(getCurrentArc(v).getEnd()) || getCurrentArc(v).getAvailableCapacity() == 0){
 				increaseCurrentArc(v);
 			}else{
-				availableCapacity.put(getCurrentArc(v).getEnd().getId(), appendCapacity(v));
-				pathToNode.put(getCurrentArc(v).getEnd().getId(), appendPath(v));
+				availableCapacity[getCurrentArc(v).getEnd().getId()] = appendCapacity(v);
+				pathToNode[getCurrentArc(v).getEnd().getId()] =  appendPath(v);
 				setVisited(getCurrentArc(v).getEnd());
-				s.add(getCurrentArc(v).getEnd());
+				s.addLast(getCurrentArc(v).getEnd());
 			}
 		}
 	}
 	
 
 	private int appendCapacity(Node n){
-		return Math.min(availableCapacity.get(n.getId()), getCurrentArc(n).getAvailableCapacity());
+		return Math.min(availableCapacity[n.getId()], getCurrentArc(n).getAvailableCapacity());
 	}
 	
-	private List<Edge> appendPath(Node n){
-		List<Edge> path = new ArrayList<>();
-		path.addAll(pathToNode.getOrDefault(n.getId(), new ArrayList<>()));
-		path.add(getCurrentArc(n));
+	private LinkedList<Edge> appendPath(Node n){
+		LinkedList<Edge> path = pathToNode[n.getId()];
+		path.addLast(getCurrentArc(n));
 		return path;	
 	}
 	
 
 	public int getAvailableCapacity(){
-		return availableCapacity.getOrDefault(graph.getEndNode().getId(),0);
+		return availableCapacity[graph.getEndNode().getId()];
 	}
 	
 	
@@ -122,15 +123,15 @@ public class BFS {
 	public List<Edge> runDinic(){
 		init();
 		iterateDinic();
-		return new ArrayList<Edge>(edgesForNode.get(graph.getEndNode().getId()));		
+		return edgesForNode[graph.getEndNode().getId()];
 	}
 	
 	private void iterateDinic(){
 		int currLevel = 0;
 		Node v = s.peek();
-		currLevel = level.get(v.getId());
+		currLevel = level[v.getId()];
 		//Break as soon as the target level is finished
-		while(currLevel <= level.getOrDefault(graph.getEndNode().getId(), Integer.MAX_VALUE) && !s.isEmpty()){
+		while(currLevel <= level[graph.getEndNode().getId()] && !s.isEmpty()){
 			if(getCurrentArc(v) == null){
 				//If Node is finished pop Node from Q
 				s.pop();
@@ -138,33 +139,35 @@ public class BFS {
 					return;
 				}
 			}else if(!isTargetHigherLevel(v, getCurrentArc(v).getEnd()) ||
-					getCurrentArc(v).getAvailableCapacity() == 0){
+				getCurrentArc(v).getAvailableCapacity() == 0){
 				//If Arc leads to higher Level node or is nonexistent, go to next arc
 				increaseCurrentArc(v);
 			}else{
 				//Else updateNodes for End of Current Arc and if seen for first time set Level and visited and add to q
 				mergeEdgesForNode(getCurrentArc(v).getEnd(), v);
-				level.putIfAbsent(getCurrentArc(v).getEnd().getId(), currLevel+1);
+				if(level[getCurrentArc(v).getEnd().getId()] == Integer.MAX_VALUE){
+				  level[getCurrentArc(v).getEnd().getId()] = currLevel+1;
+				}
 				if(!isVisited(getCurrentArc(v).getEnd())){
 					setVisited(getCurrentArc(v).getEnd());
-					s.add(getCurrentArc(v).getEnd());
+					s.addLast(getCurrentArc(v).getEnd());
 				}
 				increaseCurrentArc(v);
 			}
 			v = s.peek();
-			currLevel = level.getOrDefault(v.getId(), Integer.MAX_VALUE);
+			currLevel = level[v.getId()];
 		}
 	}
 	
 	
 	private void mergeEdgesForNode(Node n, Node prev){
-		edgesForNode.compute(n.getId(), (k, v) -> {v.addAll(edgesForNode.get(prev.getId())); v.add(getCurrentArc(prev)); return v;});
+	  edgesForNode[n.getId()].addFirst(getCurrentArc(prev));
+	  //edgesForNode.compute(n.getId(), (k, v) -> {v.addAll(edgesForNode.get(prev.getId())); v.add(getCurrentArc(prev)); return v;});
 	}
 
 	
 	private boolean isTargetHigherLevel(Node v, Node target){
-		assert(level.get(v.getId()) != null);
-		return level.getOrDefault(target.getId(), Integer.MAX_VALUE) > level.get(v.getId()); 
+		return level[target.getId()] > level[v.getId()]; 
 	}
 	
 }

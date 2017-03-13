@@ -34,14 +34,6 @@ public class Main {
 		g.calculateEdgesForNode();
 		Graph g1 = g;
 
-		FordFulkerson f = new FordFulkerson(g);
-		List<EdgePair> flow = f.run();
-		f.printFlow(flow);
-
-		EdmondsKarp e = new EdmondsKarp(g1);
-		List<EdgePair> flow2 = e.run();
-		e.printFlow(flow2);
-
 		List<Edge> n0E = g.getEdgesForNode(n0);
 		List<Edge> n1E = g.getEdgesForNode(n1);
 
@@ -68,15 +60,5 @@ public class Main {
 		Arrays.asList(n6, n7, n8, n9).stream().forEach(n -> g2.addNode(n));
 		g2.calculateEdgesForNode();
 		Graph g3 = g2;
-
-		FordFulkerson f2 = new FordFulkerson(g2);
-		List<EdgePair> flow3 = f2.run();
-		f.printFlow(flow3);
-
-		EdmondsKarp ed2 = new EdmondsKarp(g3);
-		List<EdgePair> flow4 = ed2.run();
-		e.printFlow(flow4);
-
-		MainFrame frame = new MainFrame(800, 600);
 	}
 }
