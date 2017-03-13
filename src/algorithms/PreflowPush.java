@@ -2,7 +2,6 @@ package algorithms;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import model.Edge;
 import model.EdgePair;

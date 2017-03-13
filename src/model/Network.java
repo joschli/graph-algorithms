@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,6 +71,10 @@ public class Network {
   public List<Edge> getEdgesForNode(Node n) {
     return edgesForNode.get(n.getId());
   }
+  
+  public void getNodesFromEdgePairs(){
+	  
+  }
 
 
   public void calculateEdgesForNode() {
@@ -98,4 +103,12 @@ public class Network {
   public int getHighestIndex(){
     return highestIdx;
   }
+
+public Network copy() {
+	Network copy = new Network();
+	getEdgePairs().stream().forEach(e -> copy.addEdgePair(e.clone()));
+	copy.getEdgePairs().stream().map(x -> Arrays.asList(x.fwEdge.getStart(), x.fwEdge.getEnd())).flatMap(x -> x.stream()).distinct().forEach(x -> copy.addNode(x));
+	copy.calculateEdgesForNode();
+	return copy;
+}
 }

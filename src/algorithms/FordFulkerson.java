@@ -1,5 +1,6 @@
 package algorithms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import model.Edge;
@@ -10,6 +11,7 @@ public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 
 	private Network g;
 	private int minCapacity;
+	private VisualizationData data;
 	
 	public FordFulkerson(Network g){
 		this.g = g;
@@ -20,13 +22,19 @@ public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 		init();
 		List<Edge> path; 
 		while((path = findNewFlowAugmentingPath()).size() > 0){
+			data.addPath(path);
 			increaseFlow(path);
+			data.addNetwork(g.copy());
 		}
 		return g.getEdgePairs();
 	}
 	
 	private void init(){
+		data = new VisualizationData();
 		g.getEdgePairs().stream().forEach(e -> e.clearCapacity());
+
+		data.addNetwork(g.copy());
+		data.addPath(new ArrayList<Edge>());
 	}
 	
 	private List<Edge> findNewFlowAugmentingPath(){

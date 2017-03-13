@@ -47,6 +47,16 @@ public class EdgePair {
 	public List<Edge> getEdges() {
 		return Arrays.asList(fwEdge, bwEdge);
 	}
+	
+	public EdgePair clone(){
+		EdgePair copy =  new EdgePair(fwEdge.getStart().clone(), fwEdge.getEnd().clone(), maxCapacity);
+		copy.setActualCapacity(this.capacity);
+		return copy;
+	}
+	
+	public void setActualCapacity(int amount){
+		this.capacity = amount;
+	}
 
 	public int getCapacity() {
 		return capacity;

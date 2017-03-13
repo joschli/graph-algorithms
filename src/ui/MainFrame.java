@@ -18,6 +18,7 @@ import java.util.TimerTask;
 import javax.swing.JFrame;
 
 import algorithms.EdmondsKarp;
+import algorithms.VisualizationData;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
@@ -40,7 +41,8 @@ public class MainFrame implements ActionListener {
 	Graph<Node, Edge> graph;
 
 	List<Network> networks;
-	List<EdgePair> result;
+	VisualizationData visData;
+	boolean visActivated = false;
 	int index = 0;
 
 	Timer timer;
@@ -56,7 +58,7 @@ public class MainFrame implements ActionListener {
 		this.height = height;
 		this.viewPortWidth = (int) this.width / 2;
 		this.viewPortHeight = (int) this.height / 2;
-		result = new ArrayList<>();
+		visData = new VisualizationData();
 		setupFrame();
 		modeSelection = new ModeSelection(this);
 		this.frame.add(modeSelection);
@@ -120,9 +122,11 @@ public class MainFrame implements ActionListener {
 			return path;
 		});
 		graphPanel.getRenderContext().setEdgeDrawPaintTransformer(edge -> {
-			for (EdgePair pair : result) {
-				if (pair.contains(edge)) {
-					return Color.red;
+			if(visActivated){
+				for(Edge e: visData.getHighlights().get(index)){
+					if(e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId()){
+						return Color.red;
+					}
 				}
 			}
 			return Color.black;
@@ -202,7 +206,12 @@ public class MainFrame implements ActionListener {
 				index = 0;
 			} else {
 				networks.get(index).calculateEdgesForNode();
-				result = new EdmondsKarp(networks.get(index)).run();
+				EdmondsKarp ek= new EdmondsKarp(networks.get(index));
+				ek.run();
+				visData = ek.getVisData();
+				networks = visData.getNetworks();
+				index = 0;
+				visActivated = true;
 			}
 			showGraph();
 			break;
