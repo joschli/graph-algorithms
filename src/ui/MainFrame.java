@@ -100,7 +100,6 @@ public class MainFrame implements ActionListener {
 				(int) (center.getY() - viewPortCenter.getY()));
 		for (EdgePair ep : network.getEdgePairs()) {
 			graph.addEdge(ep.fwEdge, findNode(ep.fwEdge.getStart().getId()), findNode(ep.fwEdge.getEnd().getId()));
-			graph.addEdge(ep.bwEdge, findNode(ep.bwEdge.getStart().getId()), findNode(ep.bwEdge.getEnd().getId()));
 		}
 		Layout<Node, Edge> layout = new StaticLayout<Node, Edge>(graph);
 		layout.setInitializer(input -> {
@@ -124,7 +123,8 @@ public class MainFrame implements ActionListener {
 		graphPanel.getRenderContext().setEdgeDrawPaintTransformer(edge -> {
 			if(visActivated){
 				for(Edge e: visData.getHighlights().get(index)){
-					if(e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId()){
+					if((e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId()) ||
+							(e.getEnd().getId() == edge.getStart().getId() && e.getStart().getId() == edge.getEnd().getId())){
 						return Color.red;
 					}
 				}
