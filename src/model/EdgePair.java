@@ -72,4 +72,8 @@ public class EdgePair {
 	public boolean contains(Edge edge) {
 		return fwEdge.equals(edge) || bwEdge.equals(edge);
 	}
+
+	public boolean contains(Node n) {
+		return fwEdge.getStart().equals(n) || fwEdge.getEnd().equals(n);
+	}
 }

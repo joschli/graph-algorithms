@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import algorithms.FordFulkerson;
 import model.EdgePair;
 import model.Network;
 import model.Node;
@@ -24,12 +25,12 @@ public class GraphGenerator {
 
 	public List<Network> generateGraph(int nodeCount, int graphCapacity) {
 		List<Network> graphs = generateGraph(nodeCount);
-		if (displayable) {
-			while (!checkEdges(lastGraph(graphs))) {
-				graphs = generateGraph(nodeCount);
-			}
+
+		while ((displayable && !checkEdges(lastGraph(graphs)))
+				|| !distributeCapacities(lastGraph(graphs), graphCapacity)) {
+			graphs = generateGraph(nodeCount);
 		}
-		distributeCapacities(lastGraph(graphs), graphCapacity);
+
 		return graphs;
 	}
 
@@ -96,7 +97,7 @@ public class GraphGenerator {
 		return clone;
 	}
 
-	private void distributeCapacities(Network graph, int maxCapacity) {
+	private boolean distributeCapacities(Network graph, int maxCapacity) {
 		// TODO set start/end and distribute capacity
 		Node min = null;
 		Node max = null;
@@ -117,25 +118,39 @@ public class GraphGenerator {
 				max = n;
 			}
 		}
+
 		assert (!min.equals(max));
 		graph.setStartNode(min);
 		graph.setEndNode(max);
-		List<Integer> capacities = new ArrayList<>();
-		int leftCap = maxCapacity;
-		for (int i = 0; i < graph.getEdgePairs().size(); i++) {
-			if (i == graph.getEdgePairs().size() - 1) {
-				capacities.add(leftCap);
-				break;
-			}
-			int cap = getRandomCap((int) (maxCapacity / graph.getEdgePairs().size()));
-			capacities.add(cap);
-			leftCap = leftCap - cap;
+
+		if (!checkIfConnected(graph)) {
+			return false;
 		}
-		assert (capacities.stream().count() == maxCapacity);
+
+		List<Integer> capacities = new ArrayList<>();
+		for (int i = 0; i < graph.getEdgePairs().size(); i++) {
+			int cap = getRandomCap((int) (maxCapacity / graph.getEdgePairs().size()));
+			capacities.add(getRandomCap(maxCapacity));
+		}
 
 		for (int i = 0; i < graph.getEdgePairs().size(); i++) {
 			graph.getEdgePairs().get(i).setCapacity(capacities.get(i));
 		}
+
+		if (!checkIndicentEdges(graph)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean checkIndicentEdges(Network graph) {
+		FordFulkerson fordFulkerson = new FordFulkerson(graph);
+		return false;
+	}
+
+	private boolean checkIfConnected(Network graph) {
+		return new PathExists(graph, graph.getStartNode(), graph.getEndNode()).run();
 	}
 
 	private int getRandomCap(int maxCapacity) {
