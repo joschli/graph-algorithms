@@ -1,19 +1,30 @@
 package ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 
+import algorithms.EdmondsKarp;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
+import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
-import edu.uci.ics.jung.visualization.decorators.EdgeShape;
+import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
+import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import generator.GraphGenerator;
 import model.Edge;
 import model.EdgePair;
@@ -28,51 +39,106 @@ public class MainFrame implements ActionListener {
 	Graph<Node, Edge> graph;
 
 	List<Network> networks;
+	List<EdgePair> result;
 	int index = 0;
+
+	Timer timer;
 
 	int width;
 	int height;
+	int viewPortWidth;
+	int viewPortHeight;
 	JFrame frame;
 
 	public MainFrame(int width, int height) {
 		this.width = width;
 		this.height = height;
+		this.viewPortWidth = (int) this.width / 2;
+		this.viewPortHeight = (int) this.height / 2;
+		result = new ArrayList<>();
 		setupFrame();
 
 		addMenu();
 		addGraphPanel();
+		index = networks.size() - 1;
+		showGraph();
 
 		frame.pack();
 		frame.setVisible(true);
 	}
 
 	private void setupFrame() {
-		frame = new JFrame("TEST");
+		frame = new JFrame("Graph Algorithms");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 	}
 
 	private void addGraphPanel() {
 		index = 0;
-		GraphGenerator gen = new GraphGenerator(this.getWidth() - 10, this.getHeight() - 10);
+		GraphGenerator gen = new GraphGenerator(this.width * 2, this.height * 2, true);
 		networks = gen.generateGraph(menuPanel.getNodeCount(), menuPanel.getCapacity());
 		showGraph();
 	}
 
 	private void showGraph() {
+		if (index > networks.size() - 1) {
+			index = networks.size();
+		}
 		Network network = networks.get(index);
-		graph = new SparseMultigraph<Node, Edge>();
+		graph = new DirectedSparseMultigraph<Node, Edge>();
+		Polygon poly = new Polygon();
 		for (Node n : network.getNodes()) {
 			graph.addVertex(n.clone());
+			poly.addPoint((int) n.getPoint().getX(), (int) n.getPoint().getY());
 		}
+		Rectangle r = poly.getBounds();
+		double xsc = r.getCenterX() / (this.width * 2);
+		double ysc = r.getCenterY() / (this.height * 2);
+		Point center = new Point((int) (this.viewPortWidth * xsc), (int) (this.viewPortHeight * ysc));
+		Point viewPortCenter = new Point((int) (this.viewPortWidth * 0.5), (int) (this.viewPortHeight * 0.5));
+		Point newCenter = new Point((int) (center.getX() - viewPortCenter.getX()),
+				(int) (center.getY() - viewPortCenter.getY()));
 		for (EdgePair ep : network.getEdgePairs()) {
 			graph.addEdge(ep.fwEdge, findNode(ep.fwEdge.getStart().getId()), findNode(ep.fwEdge.getEnd().getId()));
+			graph.addEdge(ep.bwEdge, findNode(ep.bwEdge.getStart().getId()), findNode(ep.bwEdge.getEnd().getId()));
 		}
-		Layout<Node, Edge> layout = new StaticLayout<Node, Edge>(graph, input -> input.getPoint());
-		layout.setSize(new Dimension(350, 350));
+		Layout<Node, Edge> layout = new StaticLayout<Node, Edge>(graph);
+		layout.setInitializer(input -> {
+			Point2D t = input.getPoint();
+			double xs = t.getX() / (this.width * 2);
+			double ys = t.getY() / (this.height * 2);
+			return new Point2D.Double((this.viewPortWidth * xs) - newCenter.getX(),
+					(viewPortHeight * ys) - newCenter.getY());
+		});
 		graphPanel = new BasicVisualizationServer<Node, Edge>(layout);
-		graphPanel.setPreferredSize(new Dimension(800, 600));
-		graphPanel.getRenderContext().setEdgeShapeTransformer(new EdgeShape<Node, Edge>(graph).new Line());
+		graphPanel.setPreferredSize(new Dimension(this.viewPortWidth, this.viewPortHeight));
+		graphPanel.getRenderContext().setEdgeShapeTransformer(edge -> {
+			GeneralPath path = new GeneralPath();
+			path.reset();
+			path.moveTo(0.0f, 0.0f);
+			path.lineTo(0.0f, 3.f);
+			path.lineTo(1.0f, 3.f);
+			path.lineTo(1.0f, 1.0f);
+			return path;
+		});
+		graphPanel.getRenderContext().setEdgeDrawPaintTransformer(edge -> {
+			for (EdgePair pair : result) {
+				if (pair.contains(edge)) {
+					return Color.red;
+				}
+			}
+			return Color.black;
+		});
+		graphPanel.getRenderContext().setVertexLabelTransformer(n -> {
+			if (network.getStartNode().getId() == n.getId()) {
+				return "s";
+			} else if (network.getEndNode().getId() == n.getId()) {
+				return "t";
+			}
+			return new ToStringLabeller().apply(n);
+		});
+		graphPanel.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
+		graphPanel.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		frame.getContentPane().add(graphPanel, BorderLayout.CENTER);
 	}
 
@@ -107,18 +173,61 @@ public class MainFrame implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		frame.getContentPane().remove(graphPanel);
 
 		switch (e.getActionCommand()) {
 		case "generate":
+			frame.getContentPane().remove(graphPanel);
 			addGraphPanel();
+			index = networks.size() - 1;
+			showGraph();
 			break;
 		case "next":
+			frame.getContentPane().remove(graphPanel);
 			showNextNetwork();
+			if (timer != null) {
+				timer.cancel();
+			}
+
+			menuPanel.enableStart();
 			break;
 		case "previous":
+			frame.getContentPane().remove(graphPanel);
 			showPreviousNetwork();
+			if (timer != null) {
+				timer.cancel();
+			}
+			menuPanel.enableStart();
 			break;
+		case "start":
+			menuPanel.start();
+			if (menuPanel.getAlgorithm() == "zg") {
+				index = 0;
+			} else {
+				networks.get(index).calculateEdgesForNode();
+				result = new EdmondsKarp(networks.get(index)).run();
+			}
+			showGraph();
+			break;
+		case "play":
+			timer = new Timer(true);
+			timer.scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					index++;
+					showGraph();
+					frame.pack();
+					if (index >= networks.size() - 1) {
+						timer.cancel();
+					}
+				}
+			}, 0, menuPanel.getDelay() * 1000);
+			menuPanel.disableStart();
+			menuPanel.enablePause();
+			break;
+		case "pause":
+			timer.cancel();
+			menuPanel.enableStart();
+			menuPanel.disablePause();
 		default:
 			break;
 		}
@@ -135,6 +244,8 @@ public class MainFrame implements ActionListener {
 		}
 		if (index >= networks.size() - 1) {
 			menuPanel.disableNext();
+			menuPanel.disableStart();
+			menuPanel.disablePause();
 		}
 
 	}

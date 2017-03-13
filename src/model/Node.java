@@ -4,7 +4,7 @@ import java.awt.Point;
 
 public class Node {
 
-	private static int ID = 0;
+	public static int ID = 0;
 
 	private int id;
 	private Point pos;
@@ -36,8 +36,11 @@ public class Node {
 	}
 
 	public boolean equals(Object other) {
+		if (other == null)
+			return false;
 		Node otherNode = (Node) other;
-		return otherNode.getId() == this.getId() && otherNode.getPoint().equals(this.getPoint());
+		return otherNode.getId() == this.getId() && otherNode.getPoint() != null && this.getPoint() != null
+				&& otherNode.getPoint().equals(this.getPoint());
 	}
 
 	public String toString() {

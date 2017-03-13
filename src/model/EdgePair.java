@@ -28,6 +28,10 @@ public class EdgePair {
 		;
 	}
 
+	public void setCapacity(int max) {
+		this.maxCapacity = max;
+	}
+
 	public int getAvailableCapacity(boolean forward) {
 		if (forward) {
 			return maxCapacity - capacity;
@@ -53,5 +57,9 @@ public class EdgePair {
 		EdgePair otherEdgePair = (EdgePair) other;
 		return otherEdgePair.fwEdge.equals(this.fwEdge) && otherEdgePair.bwEdge.equals(this.bwEdge)
 				|| otherEdgePair.fwEdge.equals(this.bwEdge) && otherEdgePair.bwEdge.equals(this.fwEdge);
+	}
+
+	public boolean contains(Edge edge) {
+		return fwEdge.equals(edge) || bwEdge.equals(edge);
 	}
 }

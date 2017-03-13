@@ -14,13 +14,38 @@ public class GraphGenerator {
 
 	private int width;
 	private int height;
+	private boolean displayable;
 
-	public GraphGenerator(int width, int height) {
+	public GraphGenerator(int width, int height, boolean displayable) {
 		this.width = width;
 		this.height = height;
+		this.displayable = displayable;
 	}
 
 	public List<Network> generateGraph(int nodeCount, int graphCapacity) {
+		List<Network> graphs = generateGraph(nodeCount);
+		if (displayable) {
+			while (!checkEdges(lastGraph(graphs))) {
+				graphs = generateGraph(nodeCount);
+			}
+		}
+		distributeCapacities(lastGraph(graphs), graphCapacity);
+		return graphs;
+	}
+
+	private boolean checkEdges(Network lastGraph) {
+		for (Node n : lastGraph.getNodes()) {
+			for (EdgePair pair : lastGraph.getEdgePairs()) {
+				double dist = createLineFromEdge(pair).ptLineDist(n.getPoint());
+				if (dist > 0.0 && dist < 30) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private List<Network> generateGraph(int nodeCount) {
 		List<Network> graphs = new ArrayList<>();
 		graphs.add(new Network());
 
@@ -39,8 +64,6 @@ public class GraphGenerator {
 			graphs.add(g);
 			e = addEdge(lastGraph(graphs), edges);
 		}
-
-		distributeCapacities(lastGraph(graphs));
 		return graphs;
 	}
 
@@ -73,21 +96,75 @@ public class GraphGenerator {
 		return clone;
 	}
 
-	private void distributeCapacities(Network graph) {
+	private void distributeCapacities(Network graph, int maxCapacity) {
 		// TODO set start/end and distribute capacity
+		Node min = null;
+		Node max = null;
+		for (Node n : graph.getNodes()) {
+			if (min == null) {
+				min = n;
+			}
+			if (n.getPoint().getX() < min.getPoint().getX() && n.getPoint().getY() > min.getPoint().getY()) {
+				min = n;
+			}
+		}
+		for (Node n : graph.getNodes()) {
+			if (max == null && !n.equals(min)) {
+				max = n;
+			}
+			if (max != null && n.getPoint().getX() > max.getPoint().getX()
+					&& n.getPoint().getY() < max.getPoint().getY()) {
+				max = n;
+			}
+		}
+		assert (!min.equals(max));
+		graph.setStartNode(min);
+		graph.setEndNode(max);
+		List<Integer> capacities = new ArrayList<>();
+		int leftCap = maxCapacity;
+		for (int i = 0; i < graph.getEdgePairs().size(); i++) {
+			if (i == graph.getEdgePairs().size() - 1) {
+				capacities.add(leftCap);
+				break;
+			}
+			int cap = getRandomCap((int) (maxCapacity / graph.getEdgePairs().size()));
+			capacities.add(cap);
+			leftCap = leftCap - cap;
+		}
+		assert (capacities.stream().count() == maxCapacity);
+
+		for (int i = 0; i < graph.getEdgePairs().size(); i++) {
+			graph.getEdgePairs().get(i).setCapacity(capacities.get(i));
+		}
+	}
+
+	private int getRandomCap(int maxCapacity) {
+		return (int) (Math.random() * (maxCapacity)) + 1;
 	}
 
 	private boolean noIntersectionWithGraph(Network graph, EdgePair edge) {
 		Line2D edgeLine = createLineFromEdge(edge);
+		boolean intersect = true;
 		for (EdgePair graphEdge : graph.getEdgePairs()) {
 			Line2D graphEdgeLine = createLineFromEdge(graphEdge);
-			if (getStartPoint(edge) != getStartPoint(graphEdge) && getStartPoint(edge) != getEndPoint(graphEdge)
+			if ((getStartPoint(edge) != getStartPoint(graphEdge) && getStartPoint(edge) != getEndPoint(graphEdge)
 					&& getEndPoint(edge) != getStartPoint(graphEdge) && getEndPoint(edge) != getEndPoint(graphEdge)
-					&& edgeLine.intersectsLine(graphEdgeLine)) {
-				return false;
+					&& edgeLine.intersectsLine(graphEdgeLine))) {
+				intersect = false;
+				break;
 			}
 		}
-		return true;
+
+		for (Node n : graph.getNodes()) {
+			if (n == edge.bwEdge.getStart() || n == edge.bwEdge.getEnd()) {
+				continue;
+			}
+			if (edgeLine.ptLineDist(n.getPoint()) == 0.0) {
+				intersect = false;
+				break;
+			}
+		}
+		return intersect;
 	}
 
 	private Point getStartPoint(EdgePair edge) {
@@ -135,12 +212,17 @@ public class GraphGenerator {
 
 	private List<Node> generateNodes(int nodeCount) {
 		List<Node> nodes = new ArrayList<>();
+		Node.ID = 0;
 		for (int i = 0; i < nodeCount; i++) {
 			Node newNode = new Node(getRandomPointInRectangle());
+			if (!displayable) {
+				nodes.add(newNode);
+				continue;
+			}
 			boolean goodPosition = false;
 			while (!goodPosition) {
 				for (Node n : nodes) {
-					if (n.getPoint().distance(newNode.getPoint()) < 80) {
+					if (n.getPoint().distance(newNode.getPoint()) < 30) {
 						goodPosition = false;
 						break;
 					}

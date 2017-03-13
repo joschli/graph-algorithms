@@ -1,8 +1,6 @@
 
 import java.util.Arrays;
-import java.util.List;
 
-import algorithms.Dinic;
 import model.EdgePair;
 import model.Network;
 import model.Node;
@@ -55,10 +53,10 @@ public class Main {
 		 * e.printFlow(flow2);
 		 */
 
-		Dinic d = new Dinic(g);
-		List<EdgePair> flow = d.run();
-		Network.printFlow(flow);
+		// Dinic d = new Dinic(g);
+		// List<EdgePair> flow = d.run();
+		// Network.printFlow(flow);
 
-		MainFrame frame = new MainFrame(800, 600);
+		MainFrame frame = new MainFrame(1600, 1200);
 	}
 }
