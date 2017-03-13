@@ -1,7 +1,6 @@
 package algorithms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,19 +10,19 @@ import model.Network;
 import model.Node;
 
 public class SimpleGraph extends Network {
-	public List<Edge> edges;
-	public Set<Node> nodes;
-	public HashMap<Integer, List<Edge>> edgesForNode;
-	public HashMap<Integer, List<Edge>> edgesToNode;
-	public int highIdx = 0;
+	private List<Edge> edges;
+	private Set<Node> nodes;
+	private List<List<Edge>> edgesForNode;
+	private List<List<Edge>> edgesToNode;
+	private boolean[][] edgeRemoved;
+	private boolean[] nodeRemoved;
+	private int highIdx = 0;
 	
 	public SimpleGraph (List<Edge> e, Node start, Node end){
 		this.edges = new ArrayList<Edge>(e);
 		this.setStartNode(start);
 		this.setEndNode(end);
 		nodes = new HashSet<Node>();
-		edgesForNode = new HashMap<Integer, List<Edge>>();
-		edgesToNode = new HashMap<Integer, List<Edge>>();
 		calculateEdgesForNodes();
 	}
 
@@ -37,30 +36,39 @@ public class SimpleGraph extends Network {
 			if(x.getEnd().getId() > highIdx){
 			  highIdx = x.getEnd().getId();
 			}
-			List<Edge> e = edgesForNode.getOrDefault(x.getStart().getId(), new ArrayList<Edge>());
-			e.add(x);
-			edgesForNode.put(x.getStart().getId(), e);
-			List<Edge> e2 = edgesToNode.getOrDefault(x.getEnd().getId(), new ArrayList<Edge>());
-			e2.add(x);
-			edgesToNode.put(x.getEnd().getId(), e2);
 		});
+		
+		edgesForNode = new ArrayList<List<Edge>>(getHighestIndex()+1);
+    edgesToNode = new ArrayList<List<Edge>>(getHighestIndex()+1);
+
+    for(int i = 0; i < getHighestIndex()+1; i++){
+      edgesForNode.add(new ArrayList<Edge>());
+      edgesToNode.add(new ArrayList<Edge>());
+    }
+    
+		edges.stream().forEach((x) -> {
+		  List<Edge> e = edgesForNode.get(x.getStart().getId());
+      e.add(x);
+      edgesForNode.add(x.getStart().getId(), e);
+      List<Edge> e2 = edgesToNode.get(x.getEnd().getId());
+      e2.add(x);
+      edgesToNode.add(x.getEnd().getId(), e2);
+		});
+    edgeRemoved = new boolean[getHighestIndex()+1][getHighestIndex()+1];
+    nodeRemoved = new boolean[getHighestIndex()+1];
 	}
 
 	public void removeEdge(Edge e) {
-		edges.remove(e);
-		edgesForNode.get(e.getStart().getId()).remove(e);
-		edgesToNode.get(e.getEnd().getId()).remove(e);
+		edgeRemoved[e.getStart().getId()][e.getEnd().getId()] = true;
 	}
 
 	public void removeNode(Node n) {
-		System.out.println("REMOVING NODE: n" + n.getId());
-		nodes.remove(n);
-		edgesForNode.get(n.getId()).stream().forEach(x -> removeEdge(x));
-		edgesToNode.get(n.getId()).stream().forEach(x -> removeEdge(x));
+		nodeRemoved[n.getId()] = true;
 	}
 
 	@Override
 	public int getHighestIndex() {return highIdx;};
+	
 	
 	@Override
 	public List<Node> getNodes(){
@@ -71,5 +79,9 @@ public class SimpleGraph extends Network {
 	public List<Edge> getEdgesForNode(Node n) {
 		return edgesForNode.get(n.getId());
 	}
+
+  public boolean isAllowed(Edge edge) {
+    return !edgeRemoved[edge.getStart().getId()][edge.getEnd().getId()] && !nodeRemoved[edge.getStart().getId()] && !nodeRemoved[edge.getEnd().getId()];
+  }
 
 }

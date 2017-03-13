@@ -34,7 +34,6 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 	}
 	// O(m*n) => m iterationen (Anzahl Edges, dajedes mal edges weniger werden) Dfs O(n) mit Nodebedingung
 	private void createAndAddBlockingFlow(List<Edge> subGraph){
-	  //TODO KOMPLEXITÄT?
 		SimpleGraph sg = new SimpleGraph(subGraph, g.getStartNode(), g.getEndNode());
 		while (true) {
 			DFSForDinic dfs = new DFSForDinic(sg);

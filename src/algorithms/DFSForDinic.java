@@ -51,7 +51,7 @@ public class DFSForDinic {
 				}else{
 					return;
 				}
-			}else if(isVisited(getCurrentArc(v).getEnd()) || getCurrentArc(v).getAvailableCapacity() == 0){
+			}else if(isVisited(getCurrentArc(v).getEnd()) || getCurrentArc(v).getAvailableCapacity() == 0 || !graph.isAllowed(getCurrentArc(v))){
 				increaseCurrentArc(v);
 			}else{
 			  path.addFirst(getCurrentArc(v));

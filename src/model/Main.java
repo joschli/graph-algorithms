@@ -58,14 +58,14 @@ public class Main {
 		/*FordFulkerson f = new FordFulkerson(g);
 		List<EdgePair> flow = f.run();
 		Graph.printFlow(flow);
-		*/
+		
 		EdmondsKarp e = new EdmondsKarp(g);
 		List<EdgePair> flow = e.run();
 		g.printFlow(flow);
-		
-		/*Dinic d = new Dinic(g);
+		*/
+		Dinic d = new Dinic(g);
 		List<EdgePair> flow = d.run();
-		Graph.printFlow(flow);
+		Network.printFlow(flow);
 		
 		/*PreflowPush p = new PreflowPush(g);
 		List<EdgePair> flow = p.run();

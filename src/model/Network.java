@@ -9,7 +9,6 @@ public class Network {
 
   private HashMap<Integer, Node> nodes;
   private List<EdgePair> edges;
-  private List<Edge> realEdges;
   private List<List<Edge>> edgesForNode;
   private Node startNode;
   private Node endNode;
@@ -67,20 +66,13 @@ public class Network {
     edges.add(new EdgePair(n1, n2, maxCapacity));
   }
   
-  public List<Edge> getRealEdges(){
-    return realEdges;
-  }
 
   public List<Edge> getEdgesForNode(Node n) {
     return edgesForNode.get(n.getId());
   }
 
-  private void calculateRealEdges(){
-    realEdges = edges.stream().map(x -> x.getEdges()).flatMap(x -> x.stream()).collect(Collectors.toList());
-  }
 
   public void calculateEdgesForNode() {
-    calculateRealEdges();
     edgesForNode = new ArrayList<List<Edge>>(getHighestIndex());
     for(int i = 0; i < getHighestIndex()+1; i++){
       edgesForNode.add(new ArrayList<Edge>());

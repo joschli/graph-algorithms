@@ -62,7 +62,7 @@ public class BFS {
 		visited = new boolean[graph.getHighestIndex()+1];
 		currentArc = new int[graph.getHighestIndex()+1];
 		
-		edgesForNode = new LinkedList[graph.getHighestIndex()];
+		edgesForNode = new LinkedList[graph.getHighestIndex()+1];
 		level = new int[graph.getHighestIndex()+1];
 		
 
@@ -74,7 +74,8 @@ public class BFS {
 					visited[x.getId()] = false;
 					currentArc[x.getId()] = 0;
 					level[x.getId()] = Integer.MAX_VALUE;
-					pathToNode[x.getId()] = new LinkedList<Edge>();});
+					pathToNode[x.getId()] = new LinkedList<Edge>();
+					edgesForNode[x.getId()] = new LinkedList<Edge>();});
 		visited[graph.getStartNode().getId()] = true;
     level[graph.getStartNode().getId()] = 0;
 	}
@@ -119,7 +120,27 @@ public class BFS {
 	public List<Edge> runDinic(){
 		init();
 		iterateDinic();
-		return edgesForNode[graph.getEndNode().getId()];
+		return getEdges();
+	}
+	
+	private List<Edge> getEdges(){
+	  LinkedList<Edge> s = edgesForNode[graph.getEndNode().getId()];
+	  LinkedList<Edge> withoutDuplicates = new LinkedList<Edge>();
+	  boolean[][] exists = new boolean[graph.getHighestIndex()+1][graph.getHighestIndex()+1];
+	  
+	  while(!s.isEmpty()){
+	    Edge e = s.pop();
+	    exists[e.getStart().getId()][e.getEnd().getId()] = true;
+	    withoutDuplicates.addFirst(e);
+	    while(edgesForNode[e.getStart().getId()].size() > 0){
+	      Edge e_nxt = edgesForNode[e.getStart().getId()].pop();
+	      if(!exists[e_nxt.getStart().getId()][e_nxt.getEnd().getId()]){
+	        s.addFirst(e_nxt);
+	      }
+	    }
+	    
+	  }
+	  return withoutDuplicates;
 	}
 	
 	private void iterateDinic(){
@@ -158,7 +179,6 @@ public class BFS {
 	
 	private void mergeEdgesForNode(Node n, Node prev){
 	  edgesForNode[n.getId()].addFirst(getCurrentArc(prev));
-	  //edgesForNode.compute(n.getId(), (k, v) -> {v.addAll(edgesForNode.get(prev.getId())); v.add(getCurrentArc(prev)); return v;});
 	}
 
 	
