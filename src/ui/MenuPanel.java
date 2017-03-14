@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 public class MenuPanel extends JPanel {
 
-	JFormattedTextField nodeCountField;
+	JComboBox<Integer> nodeCountField;
 	JFormattedTextField capacityField;
 	JFormattedTextField delayField;
 
@@ -58,14 +58,14 @@ public class MenuPanel extends JPanel {
 		backwardButton.setEnabled(false);
 
 		String[] algorithms = { "zg", "EdmondsKarp", "FordFulkerson", "Dinic", "GoldbergTarjan" };
+		Integer[] nodeCounts = { 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 
 		algorithmSelection = new JComboBox<String>(algorithms);
 		algorithmSelection.setSelectedIndex(0);
 		algorithmSelection.addActionListener(parent);
 		JLabel nodeCountLabel = new JLabel("Nodes:");
-		nodeCountField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-		nodeCountField.setValue(new Long(10));
-		nodeCountField.setColumns(3);
+		nodeCountField = new JComboBox<Integer>(nodeCounts);
+
 		JLabel capacityLabel = new JLabel("Capacity:");
 		capacityField = new JFormattedTextField(NumberFormat.getIntegerInstance());
 		capacityField.setValue(new Long(5));
@@ -121,7 +121,7 @@ public class MenuPanel extends JPanel {
 	}
 
 	public int getNodeCount() {
-		return ((Long) nodeCountField.getValue()).intValue();
+		return (Integer) nodeCountField.getSelectedItem();
 	}
 
 	public int getDelay() {
