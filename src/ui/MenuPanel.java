@@ -23,6 +23,8 @@ public class MenuPanel extends JPanel {
 	JButton previousButton;
 	JButton pauseButton;
 	JButton playButton;
+	JButton forwardButton;
+	JButton backwardButton;
 	JLabel stepLabel;
 
 	JButton generateButton;
@@ -42,6 +44,8 @@ public class MenuPanel extends JPanel {
 		playButton = createButton("|>", "play", parent);
 		pauseButton = createButton("||", "pause", parent);
 		backButton = createButton("back", "back", parent);
+		forwardButton = createButton(">>>", "toEnd", parent);
+		backwardButton = createButton("<<<", "toStart", parent);
 
 		playButton.setVisible(false);
 		previousButton.setVisible(false);
@@ -49,6 +53,9 @@ public class MenuPanel extends JPanel {
 		nextButton.setVisible(false);
 		pauseButton.setVisible(false);
 		pauseButton.setEnabled(false);
+		forwardButton.setVisible(false);
+		backwardButton.setVisible(false);
+		backwardButton.setEnabled(false);
 
 		String[] algorithms = { "zg", "EdmondsKarp", "FordFulkerson", "Dinic", "GoldbergTarjan" };
 
@@ -85,14 +92,17 @@ public class MenuPanel extends JPanel {
 
 		this.add(nodeCountPanel);
 		this.add(generateButton);
-		this.add(startButton);
 		this.add(algorithmSelection);
+		this.add(startButton);
+
 		this.add(backButton);
 		this.add(delayPanel);
+		this.add(backwardButton);
 		this.add(previousButton);
 		this.add(pauseButton);
 		this.add(playButton);
 		this.add(nextButton);
+		this.add(forwardButton);
 		this.add(stepLabel);
 
 		this.setMinimumSize(new Dimension((int) (0.2 * parent.getWidth()), parent.getHeight()));
@@ -120,18 +130,22 @@ public class MenuPanel extends JPanel {
 
 	public void disableNext() {
 		nextButton.setEnabled(false);
+		forwardButton.setEnabled(false);
 	}
 
 	public void enablePrevious() {
 		previousButton.setEnabled(true);
+		backwardButton.setEnabled(true);
 	}
 
 	public void enableNext() {
 		nextButton.setEnabled(true);
+		forwardButton.setEnabled(true);
 	}
 
 	public void disablePrevious() {
 		previousButton.setEnabled(false);
+		backwardButton.setEnabled(false);
 	}
 
 	public void start() {
@@ -146,6 +160,8 @@ public class MenuPanel extends JPanel {
 		pauseButton.setVisible(true);
 		backButton.setVisible(true);
 		stepLabel.setVisible(true);
+		backwardButton.setVisible(true);
+		forwardButton.setVisible(true);
 	}
 
 	public void restart() {
@@ -160,6 +176,8 @@ public class MenuPanel extends JPanel {
 		pauseButton.setVisible(false);
 		backButton.setVisible(false);
 		stepLabel.setVisible(false);
+		backwardButton.setVisible(false);
+		forwardButton.setVisible(false);
 	}
 
 	public void disableStart() {
