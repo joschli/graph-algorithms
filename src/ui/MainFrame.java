@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -153,6 +154,33 @@ public class MainFrame implements ActionListener {
 			return Color.black;
 		});
 
+		graphPanel.getRenderContext().setEdgeStrokeTransformer((edge) -> {
+			if (visActivated) {
+				if (visData.hasSecondaryHighlights()) {
+					for (Edge e : visData.getSecondaryHighlights().get(index)) {
+						if ((e.getStart().getId() == edge.getStart().getId()
+								&& e.getEnd().getId() == edge.getEnd().getId())
+								|| (e.getEnd().getId() == edge.getStart().getId()
+										&& e.getStart().getId() == edge.getEnd().getId())) {
+							return new BasicStroke(3);
+						}
+					}
+				}
+
+				for (Edge e : visData.getHighlights().get(index)) {
+					if ((e.getStart().getId() == edge.getStart().getId()
+							&& e.getEnd().getId() == edge.getEnd().getId())) {
+						return new BasicStroke(3);
+					}
+					if ((e.getEnd().getId() == edge.getStart().getId()
+							&& e.getStart().getId() == edge.getEnd().getId())) {
+						return new BasicStroke(3);
+					}
+				}
+			}
+			return new BasicStroke(1);
+		});
+
 		graphPanel.getRenderContext().setVertexLabelTransformer(n -> {
 			if (visActivated) {
 				if (visData.isGoldbergTarjan()) {
@@ -163,9 +191,15 @@ public class MainFrame implements ActionListener {
 			return "";
 		});
 
+		graphPanel.getRenderContext().setEdgeFontTransformer(edge -> {
+			return new Font("ARIAL", Font.BOLD, 16);
+		});
+
 		graphPanel.getRenderContext().setVertexStrokeTransformer((n) -> new BasicStroke(2));
 
-		graphPanel.getRenderContext().setVertexDrawPaintTransformer(n -> {
+		graphPanel.getRenderContext().setVertexDrawPaintTransformer(n ->
+
+		{
 			if (visActivated) {
 				if (visData.isGoldbergTarjan()) {
 					if (visData.getCuts().get(index).contains(n)) {
@@ -176,7 +210,9 @@ public class MainFrame implements ActionListener {
 			return Color.BLACK;
 		});
 
-		graphPanel.getRenderContext().setVertexFillPaintTransformer(node -> {
+		graphPanel.getRenderContext().setVertexFillPaintTransformer(node ->
+
+		{
 			if (visActivated) {
 				if (visData.isGoldbergTarjan()) {
 					if (node.equals(visData.getNodeHighlights().get(index))) {
@@ -194,15 +230,20 @@ public class MainFrame implements ActionListener {
 			return Color.gray;
 		});
 		graphPanel.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
+
+		graphPanel.getRenderContext().setLabelOffset(5);
 		graphPanel.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		visLabel = new JTextField("Generate a graph and use a specific algorithm to solve it!");
 		visLabel.setEditable(false);
 		visLabel.setBorder(null);
-		if (!visData.getLabels().isEmpty()) {
+		if (!visData.getLabels().isEmpty())
+
+		{
 			visLabel.setText(visData.getLabels().get(index));
 		}
 		graphPanel.add(visLabel);
 		frame.getContentPane().add(graphPanel, BorderLayout.CENTER);
+
 	}
 
 	private void showNextNetwork() {
@@ -277,7 +318,6 @@ public class MainFrame implements ActionListener {
 				index = 0;
 				visActivated = true;
 			} else if (menuPanel.getAlgorithm().equals("FordFulkerson")) {
-				System.out.println("FORD FULKERSON");
 				networks.get(index).calculateEdgesForNode();
 				FordFulkerson ff = new FordFulkerson(networks.get(index));
 				ff.setVisualization(true);
@@ -287,7 +327,6 @@ public class MainFrame implements ActionListener {
 				index = 0;
 				visActivated = true;
 			} else if (menuPanel.getAlgorithm().equals("Dinic")) {
-				System.out.println("DINIC");
 				networks.get(index).calculateEdgesForNode();
 				Dinic d = new Dinic(networks.get(index));
 				d.setVisualization(true);
@@ -298,7 +337,6 @@ public class MainFrame implements ActionListener {
 				index = 0;
 				visActivated = true;
 			} else if (menuPanel.getAlgorithm().equals("GoldbergTarjan")) {
-				System.out.println("GOLDBERG TARJAN");
 				networks.get(index).calculateEdgesForNode();
 				PreflowPush pp = new PreflowPush(networks.get(index));
 				pp.setVisualization(true);

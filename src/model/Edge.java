@@ -41,7 +41,7 @@ public class Edge {
 
 	@Override
 	public String toString() {
-		return "<html><b>" + pair.getCapacity() + "|" + (pair.getAvailableCapacity(true) + pair.getCapacity()) + "</b> </html>";
+		return pair.getCapacity() + " / " + (pair.getAvailableCapacity(true) + pair.getCapacity());
 	}
 
 }
