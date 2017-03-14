@@ -113,4 +113,19 @@ public Network copy() {
 	copy.calculateEdgesForNode();
 	return copy;
 }
+
+
+public List<Node> getNeighbors(Node n) {
+	List<Node> neighbors = new ArrayList<>();
+	for (EdgePair e : edges) {
+		if (!e.contains(n)) {
+			continue;
+		}
+		if (e.fwEdge.getStart().equals(n)) {
+			neighbors.add(e.fwEdge.getEnd());
+		}
+	}
+	return neighbors;
+}
+
 }
