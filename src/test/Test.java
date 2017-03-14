@@ -200,7 +200,7 @@ public class Test {
 
 	private boolean checkFlowTest(InstanceResult res) {
 		InstanceResult testInstance = new InstanceResult(res.algorithm, res.result, res.instance.copy());
-		int randomIndex = ((int) (Math.random()*testInstance.instance.getEdgePairs().size()-3))+1;
+		int randomIndex = ((int) (Math.random()*(testInstance.instance.getEdgePairs().size()-3)))+1;
 		int cap = testInstance.instance.getEdgePairs().get(randomIndex).getCapacity();
 		testInstance.instance.getEdgePairs().get(randomIndex).setActualCapacity(cap+1);;
 		

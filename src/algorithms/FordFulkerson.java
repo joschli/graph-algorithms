@@ -41,7 +41,7 @@ public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 			if(visualization){
 				data.addPath(path);
 				data.addNetwork(g.copy());
-				data.addLabel("Augmenting Path got Augmented with" + minCapacity + " Capacity");
+				data.addLabel("Augmenting Path with " + minCapacity + " Capacity");
 			}
 		}
 		return g.getEdgePairs();

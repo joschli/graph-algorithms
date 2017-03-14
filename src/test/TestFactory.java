@@ -13,7 +13,7 @@ public class TestFactory {
 
 	public static Test createSmallTestCase() {
 		List<Triplet> triplets = new ArrayList<>();
-		triplets.add(new Triplet(1, 5, 20));
+		triplets.add(new Triplet(1, 6, 20));
 		triplets.add(new Triplet(3, 10, 40));
 		triplets.add(new Triplet(2, 15, 100));
 		return new Test(triplets);
