@@ -108,7 +108,7 @@ public class GraphGenerator {
 			return false;
 		}
 		int tryCount = 0;
-		
+
 		while (!validCapacityDistribution(graph)) {
 			if (tryCount == 5) {
 				return false;
@@ -135,9 +135,9 @@ public class GraphGenerator {
 		}
 
 		changeEdgeDirections(graph);
-		/*if(!validNodes(graph)){
+		if (!validNodes(graph)) {
 			return false;
-		}*/
+		}
 		BFSAll bfs = new BFSAll(graph);
 		List<Node> reachableNodes = bfs.run();
 		return reachableNodes.size() == graph.getNodes().size();
@@ -214,7 +214,7 @@ public class GraphGenerator {
 		int maxFlow = calcMaxFlow(clonedGraph);
 		clonedGraph.clearCapacities();
 		for (EdgePair edgePair : fullEdges) {
-			edgePair.setCapacity(edgePair.getMaxCapacity()-1);
+			edgePair.setCapacity(edgePair.getMaxCapacity() - 1);
 			FordFulkerson f = new FordFulkerson(clonedGraph);
 			f.run();
 			int newMaxFlow = calcMaxFlow(f.getGraph());

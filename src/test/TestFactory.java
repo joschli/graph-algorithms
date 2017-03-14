@@ -5,6 +5,12 @@ import java.util.List;
 
 public class TestFactory {
 
+	public static Test createVerySmallTestCase() {
+		List<Triplet> triplets = new ArrayList<>();
+		triplets.add(new Triplet(1, 6, 20));
+		return new Test(triplets);
+	}
+
 	public static Test createSmallTestCase() {
 		List<Triplet> triplets = new ArrayList<>();
 		triplets.add(new Triplet(1, 5, 20));
@@ -12,8 +18,8 @@ public class TestFactory {
 		triplets.add(new Triplet(2, 15, 100));
 		return new Test(triplets);
 	}
-	
-	public static Test createMediumTestCase(){
+
+	public static Test createMediumTestCase() {
 		List<Triplet> triplets = new ArrayList<>();
 		triplets.add(new Triplet(50, 10, 100));
 		triplets.add(new Triplet(50, 15, 100));

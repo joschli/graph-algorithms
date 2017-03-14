@@ -16,6 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JFrame;
+import javax.swing.JTextField;
 
 import algorithms.Dinic;
 import algorithms.EdmondsKarp;
@@ -44,6 +45,8 @@ public class MainFrame implements ActionListener {
 	BasicVisualizationServer<Node, Edge> graphPanel;
 	Graph<Node, Edge> graph;
 
+	JTextField visLabel;
+
 	List<Network> networks;
 	VisualizationData visData;
 	boolean visActivated = false;
@@ -71,7 +74,7 @@ public class MainFrame implements ActionListener {
 		frame.setVisible(true);
 	}
 
-	private void packAndCenterFrame() {
+	public void packAndCenterFrame() {
 		frame.pack();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
@@ -94,6 +97,7 @@ public class MainFrame implements ActionListener {
 		if (index > networks.size() - 1) {
 			index = networks.size();
 		}
+
 		Network network = networks.get(index);
 		graph = new DirectedSparseMultigraph<Node, Edge>();
 		Polygon poly = new Polygon();
@@ -191,6 +195,13 @@ public class MainFrame implements ActionListener {
 		});
 		graphPanel.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
 		graphPanel.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+		visLabel = new JTextField("Generate a graph and use a specific algorithm to solve it!");
+		visLabel.setEditable(false);
+		visLabel.setBorder(null);
+		if (!visData.getLabels().isEmpty()) {
+			visLabel.setText(visData.getLabels().get(index));
+		}
+		graphPanel.add(visLabel);
 		frame.getContentPane().add(graphPanel, BorderLayout.CENTER);
 	}
 
@@ -333,7 +344,10 @@ public class MainFrame implements ActionListener {
 				index = networks.size() - 1;
 				showGraph();
 			} else if (mode == "test") {
-				System.exit(0);
+				addTestPanel();
+				this.frame.remove(modeSelection);
+				packAndCenterFrame();
+				return;
 			}
 			this.frame.remove(modeSelection);
 			this.frame.pack();
@@ -375,6 +389,11 @@ public class MainFrame implements ActionListener {
 			menuPanel.disablePause();
 		}
 
+	}
+
+	private void addTestPanel() {
+		TestPanel panel = new TestPanel(this);
+		frame.getContentPane().add(panel, BorderLayout.CENTER);
 	}
 
 	public int getWidth() {

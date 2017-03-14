@@ -25,7 +25,7 @@ public class TimedExecution<T, V> {
 
 	public double run(int iterations) {
 		List<Long> runTimes = new ArrayList<>();
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < iterations; i++) {
 			runTimes.add(time());
 		}
 		double sum = runTimes.stream().reduce((long) 0, (a, b) -> a + b);
