@@ -62,6 +62,6 @@ public class Main {
 		// List<EdgePair> flow = d.run();
 		// Network.printFlow(flow);
 
-		MainFrame frame = new MainFrame(1600, 1200);
+		MainFrame frame = new MainFrame(3800, 2000);
 	}
 }

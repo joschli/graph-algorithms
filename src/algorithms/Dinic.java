@@ -34,12 +34,14 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 	}
 
 	private void init() {
+		g.getEdgePairs().stream().forEach(e -> e.clearCapacity());
+
 		data = new VisualizationData();
 		data.addNetwork(g.copy());
 		data.addPath(new ArrayList<Edge>());
 		data.addSecondaryHighlight(new ArrayList<Edge>());
 		data.setSecondaryHighlights(true);
-		g.getEdgePairs().stream().forEach(e -> e.clearCapacity());
+		data.addLabel("After Initialization");
 	}
 
 	private List<Edge> findSubgraph() {
@@ -63,6 +65,7 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 				sg.removeEdge(x);
 			});
 		}
+		data.addLabel("Shortest Path Subgraph with Blocking Flow");
 		data.addSecondaryHighlight(secondaryHighlight);
 
 	}

@@ -29,6 +29,7 @@ public class EdmondsKarp extends AbstractMaxFlowAlgorithm {
 			data.addPath(path);
 			increaseFlow(path);
 			data.addNetwork(g.copy());
+			data.addLabel("Augmenting Shortest Path got augmented with" + minCapacity + " capacity");
 		}
 		return g.getEdgePairs();
 	}
@@ -39,6 +40,7 @@ public class EdmondsKarp extends AbstractMaxFlowAlgorithm {
 
 		data.addNetwork(g.copy());
 		data.addPath(new ArrayList<Edge>());
+		data.addLabel("After Initialization");
 	}
 	
 	private List<Edge> findNewFlowAugmentingPath(){

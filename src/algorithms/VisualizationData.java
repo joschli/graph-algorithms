@@ -5,19 +5,35 @@ import java.util.List;
 
 import model.Edge;
 import model.Network;
+import model.Node;
 
 public class VisualizationData {
-
+/*
+ * Usage: Ford Fulkerson und EdmondsKarps = highlights, labels, graphs für hervorgehobene Pfade(List<Edge>), Beschreibungsstrings und Graphen nach jedem Schritt
+ * Dinic: Testen mit hatSecondaryHighlights ob Dinic, zusätzlich zu den obigen noch secondaryHighlights als Zweite List<Edge> am besten in anderer Farbe
+ * Preflow-Push: Mit goldberg testen ob ist, benutzt highlights, labels, graphs, nodelabels (für Beschriftung der Nodes nach Höhe), nodeHighlights zum Highlighten einzelner Nodes
+ * 						=> NodeHighlight ist entweder null oder eine Node die gehighlightet werden soll, highlihgts ist entweder leere Liste oder eine einzelne Edge
+ * 
+ * 
+ */
+	
+	
 	private List<Network> graphs;
 	private List<List<Edge>> highlights;
 	private List<List<Edge>> secondaryHighlights;
+	private List<Node> nodeHighlight;
+	private List<int[]> nodeLabels;
+	private List<String> labels;
 	
+	private boolean goldberg = false;
 	private boolean hasSecondaryHighlights = false;
 	
 	public VisualizationData(){
 		graphs = new ArrayList<Network>();
 		highlights = new ArrayList<List<Edge>>();
 		secondaryHighlights = new ArrayList<List<Edge>>();
+		nodeHighlight = new ArrayList<Node>();
+		nodeLabels = new ArrayList<int[]>();
 	}
 	
 	public void addNetwork(Network n){
@@ -36,6 +52,34 @@ public class VisualizationData {
 		this.hasSecondaryHighlights = b;
 	}
 	
+	public void addNodeHighlight(Node n){
+		nodeHighlight.add(n);
+	}
+	
+	public void addNobeLabels(int[] labels){
+		nodeLabels.add(labels);
+	}
+	
+	public void addLabel(String label){
+		labels.add(label);
+	}
+	
+	public List<String> getLabels(){
+		return labels;
+	}
+	
+	public List<int[]> getNodeLabels(){
+		return nodeLabels;
+	}
+	
+	public void setGoldbergTarjan(boolean b){
+		goldberg = b;
+	}
+	
+	public boolean isGoldbergTarjan(){
+		return goldberg;
+	}
+	
 	public List<Network> getNetworks(){
 		return graphs;
 	}
@@ -50,6 +94,10 @@ public class VisualizationData {
 	
 	public boolean hasSecondaryHighlights(){
 		return hasSecondaryHighlights;
+	}
+	
+	public List<Node> getNodeHighlights(){
+		return nodeHighlight;
 	}
 	
 }

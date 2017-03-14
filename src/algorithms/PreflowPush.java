@@ -1,5 +1,7 @@
 package algorithms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +15,8 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
   private int[] currentArc;
   private int[] d;
   private int[] excess;
+  
+  private VisualizationData visData;
 
   private LinkedList<Node> s;
   
@@ -49,7 +53,7 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	        .forEach(x -> {
 	                currentArc[x.getId()]= 0;
 	                excess[x.getId()]= 0;
-	              });
+	               });
 	
 		graph.getEdgePairs().stream().forEach(e -> e.clearCapacity());
 		graph.getEdgesForNode(graph.getStartNode())
@@ -59,6 +63,15 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	              edge.addCapacity(edge.getAvailableCapacity());
 	              s.addFirst(edge.getEnd());
 	            });
+		
+
+		visData = new VisualizationData();
+		visData.addNetwork(graph.copy());
+		visData.addNodeHighlight(null);
+		visData.addNobeLabels(d);
+		visData.addPath(new ArrayList<Edge>());
+		visData.addLabel("After Initialization");
+		visData.setGoldbergTarjan(true);
 	}
 	
 	
@@ -75,27 +88,36 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	        increaseCurrentArc(v);
 	      }else if(getCurrentArc(v) != null && getCurrentArc(v).getAvailableCapacity() != 0 && isAdmissible(getCurrentArc(v))){
 	        int w_id = getCurrentArc(v).getEnd().getId();
-  	       if(w_id != graph.getStartNode().getId() && w_id != graph.getEndNode().getId() && getExcess(w_id) == 0){
-  	         s.addLast(getCurrentArc(v).getEnd());
-  	       }
-  	       //Increase Flow over (v,w) by
-  	       int min = Math.min(getExcess(v.getId()), getCurrentArc(v).getAvailableCapacity());
-  	       getCurrentArc(v).addCapacity(min);
-  	       //Increase Excess of w by min and decrease excess of f by that value
-  	       increaseExcess(w_id, min);
-  	       decreaseExcess(v.getId(), min);
-  	       if(getExcess(v.getId()) == 0){
-  	         s.pop();
-  	       }
+	        if(w_id != graph.getStartNode().getId() && w_id != graph.getEndNode().getId() && getExcess(w_id) == 0){
+	  	         s.addLast(getCurrentArc(v).getEnd());
+  	        }
+  	        //Increase Flow over (v,w) by
+  	        int min = Math.min(getExcess(v.getId()), getCurrentArc(v).getAvailableCapacity());
+  	        getCurrentArc(v).addCapacity(min);
+  	        //Increase Excess of w by min and decrease excess of f by that value
+  	        increaseExcess(w_id, min);
+  	        decreaseExcess(v.getId(), min);
+  	        if(getExcess(v.getId()) == 0){
+  	          s.pop();
+  	        }
+  	        visData.addLabel("Pushed " + min + " capacity on Edge");
+  	        visData.addNobeLabels(d);
+  	        visData.addNetwork(graph.copy());
+  	        visData.addNodeHighlight(null);
+  	        visData.addPath(Arrays.asList(getCurrentArc(v)));
 	      }else{
 	        int dmin = getMinD(v);
+	        visData.addLabel("Relabeled Node from " + d[v.getId()] + " to " + (dmin+1));
 	        d[v.getId()] = dmin +1;
-	        resetCurrentArc(v);
+	        resetCurrentArc(v); 
+	        visData.addNetwork(graph.copy());
+	        visData.addNobeLabels(d);
+	        visData.addNodeHighlight(v);
+	        visData.addPath(new ArrayList<Edge>());
 	      }
 	    }
 	}
 	
-	//TODO: OPTIMIERUNG??
 	private int getMinD(Node v){
 		return graph.getEdgesForNode(v).stream().map(x -> {return x.getAvailableCapacity()!=0 ? d[x.getEnd().getId()]: Integer.MAX_VALUE;}).min(Integer::compare).get();
 	}
