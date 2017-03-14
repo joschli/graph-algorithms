@@ -344,6 +344,17 @@ public class MainFrame implements ActionListener {
 			visActivated = false;
 			showGraph();
 			break;
+
+		case "toEnd":
+			index = networks.size() - 1;
+			showGraph();
+			menuPanel.setCurrentStep(index);
+			break;
+		case "toStart":
+			index = 0;
+			showGraph();
+			menuPanel.setCurrentStep(index);
+			break;
 		default:
 			break;
 		}
