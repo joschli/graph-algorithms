@@ -15,8 +15,9 @@ import model.Node;
 
 public class GraphGenerator {
 
-	public static final int NODEDISTANCE = 50;
-	public static final int EDGEDISTANCE = 50;
+	public static final int NODEDISTANCE = 750;
+	public static final int EDGEDISTANCE = 30;
+	public static final boolean increaseStartCapacities = true;
 
 	private int width;
 	private int height;
@@ -110,11 +111,15 @@ public class GraphGenerator {
 		int tryCount = 0;
 		
 		while (!validCapacityDistribution(graph)) {
+
 			if (tryCount == 5) {
 				return false;
 			}
-
-			distributeCapacities(graph, maxCapacity);
+			if(tryCount == 0 && increaseStartCapacities){
+				distributeIncreasedCapacities(graph, maxCapacity);
+			}else{
+				distributeCapacities(graph, maxCapacity);
+			}
 			tryCount++;
 		}
 
@@ -202,6 +207,11 @@ public class GraphGenerator {
 			graph.getEdgePairs().get(i).setCapacity(capacities.get(i));
 		}
 	}
+	
+	private void distributeIncreasedCapacities(Network graph, int maxCapacity){
+		graph.getEdgePairsForNode(graph.getStartNode()).stream().forEach(x -> x.setCapacity(maxCapacity));
+		graph.getEdgePairsForNode(graph.getEndNode()).stream().forEach(x -> x.setCapacity(maxCapacity));
+	}
 
 	private boolean validCapacityDistribution(Network graph) {
 		Network clonedGraph = graph.copy();
@@ -225,7 +235,6 @@ public class GraphGenerator {
 		}
 
 		return true;
-
 	}
 
 	private int calcMaxFlow(Network graph) {
