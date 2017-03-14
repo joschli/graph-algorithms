@@ -39,7 +39,7 @@ public class Node {
 		if (other == null)
 			return false;
 		Node otherNode = (Node) other;
-		return otherNode.getId() == this.getId() || otherNode.getPoint() == this.getPoint();
+		return otherNode.getId() == this.getId();
 	}
 
 	public String toString() {

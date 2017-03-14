@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
@@ -29,7 +30,6 @@ import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import generator.GraphGenerator;
-import javafx.scene.text.Font;
 import model.Edge;
 import model.EdgePair;
 import model.Network;
@@ -66,8 +66,14 @@ public class MainFrame implements ActionListener {
 		modeSelection = new ModeSelection(this);
 		this.frame.add(modeSelection);
 
-		frame.pack();
+		packAndCenterFrame();
 		frame.setVisible(true);
+	}
+
+	private void packAndCenterFrame() {
+		frame.pack();
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
 	}
 
 	private void setupFrame() {
@@ -117,50 +123,45 @@ public class MainFrame implements ActionListener {
 		graphPanel.getRenderContext().setEdgeShapeTransformer(new EdgeShape<Node, Edge>(graph).new Line());
 		graphPanel.getRenderContext().setEdgeDrawPaintTransformer(edge -> {
 			if (visActivated) {
-				if(visData.hasSecondaryHighlights()){
-					for(Edge e : visData.getSecondaryHighlights().get(index)){
-						if ((e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId())
+				if (visData.hasSecondaryHighlights()) {
+					for (Edge e : visData.getSecondaryHighlights().get(index)) {
+						if ((e.getStart().getId() == edge.getStart().getId()
+								&& e.getEnd().getId() == edge.getEnd().getId())
 								|| (e.getEnd().getId() == edge.getStart().getId()
 										&& e.getStart().getId() == edge.getEnd().getId())) {
 							return Color.cyan;
 						}
 					}
 				}
-				
+
 				for (Edge e : visData.getHighlights().get(index)) {
-					if ((e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId())) {
+					if ((e.getStart().getId() == edge.getStart().getId()
+							&& e.getEnd().getId() == edge.getEnd().getId())) {
 						return Color.red;
 					}
-					if((e.getEnd().getId() == edge.getStart().getId()
-									&& e.getStart().getId() == edge.getEnd().getId())){
+					if ((e.getEnd().getId() == edge.getStart().getId()
+							&& e.getStart().getId() == edge.getEnd().getId())) {
 						return Color.orange;
 					}
-				}				
+				}
 			}
 			return Color.black;
 		});
-		// graphPanel.getRenderContext().setVertexLabelTransformer(n -> {
-		// if (network.getStartNode().getId() == n.getId()) {
-		// return "s";
-		// } else if (network.getEndNode().getId() == n.getId()) {
-		// return "t";
-		// }
-		// return new ToStringLabeller().apply(n);
-		// });
-		
+
 		graphPanel.getRenderContext().setVertexLabelTransformer(n -> {
-			if(visActivated){
-				if(visData.isGoldbergTarjan()){
-					return "<html><font color='white'><b>"+  Integer.toString(visData.getNodeLabels().get(index)[n.getId()])+ "</b></font></html>";
+			if (visActivated) {
+				if (visData.isGoldbergTarjan()) {
+					return "<html><font color='white'><b>"
+							+ Integer.toString(visData.getNodeLabels().get(index)[n.getId()]) + "</b></font></html>";
 				}
 			}
 			return "";
 		});
-		
+
 		graphPanel.getRenderContext().setVertexFillPaintTransformer(node -> {
-			if(visActivated){
-				if(visData.isGoldbergTarjan()){
-					if(node.equals(visData.getNodeHighlights().get(index))){
+			if (visActivated) {
+				if (visData.isGoldbergTarjan()) {
+					if (node.equals(visData.getNodeHighlights().get(index))) {
 						return Color.blue;
 					}
 				}
@@ -183,6 +184,7 @@ public class MainFrame implements ActionListener {
 			return;
 		}
 		index++;
+		menuPanel.setCurrentStep(index);
 		showGraph();
 	}
 
@@ -191,6 +193,7 @@ public class MainFrame implements ActionListener {
 			return;
 		}
 		index--;
+		menuPanel.setCurrentStep(index);
 		showGraph();
 	}
 
@@ -238,7 +241,7 @@ public class MainFrame implements ActionListener {
 			menuPanel.start();
 			if (menuPanel.getAlgorithm() == "zg") {
 				index = 0;
-			} else if(menuPanel.getAlgorithm().equals("EdmondsKarp")){
+			} else if (menuPanel.getAlgorithm().equals("EdmondsKarp")) {
 				networks.get(index).calculateEdgesForNode();
 				EdmondsKarp ek = new EdmondsKarp(networks.get(index));
 				ek.setVisualization(true);
@@ -247,7 +250,7 @@ public class MainFrame implements ActionListener {
 				networks = visData.getNetworks();
 				index = 0;
 				visActivated = true;
-			}else if(menuPanel.getAlgorithm().equals("FordFulkerson")){
+			} else if (menuPanel.getAlgorithm().equals("FordFulkerson")) {
 				System.out.println("FORD FULKERSON");
 				networks.get(index).calculateEdgesForNode();
 				FordFulkerson ff = new FordFulkerson(networks.get(index));
@@ -257,7 +260,7 @@ public class MainFrame implements ActionListener {
 				networks = visData.getNetworks();
 				index = 0;
 				visActivated = true;
-			}else if(menuPanel.getAlgorithm().equals("Dinic")){
+			} else if (menuPanel.getAlgorithm().equals("Dinic")) {
 				System.out.println("DINIC");
 				networks.get(index).calculateEdgesForNode();
 				Dinic d = new Dinic(networks.get(index));
@@ -268,7 +271,7 @@ public class MainFrame implements ActionListener {
 				networks = visData.getNetworks();
 				index = 0;
 				visActivated = true;
-			}else if(menuPanel.getAlgorithm().equals("GoldbergTarjan")){
+			} else if (menuPanel.getAlgorithm().equals("GoldbergTarjan")) {
 				System.out.println("GOLDBERG TARJAN");
 				networks.get(index).calculateEdgesForNode();
 				PreflowPush pp = new PreflowPush(networks.get(index));
@@ -279,6 +282,9 @@ public class MainFrame implements ActionListener {
 				index = 0;
 				visActivated = true;
 			}
+			menuPanel.setCurrentStep(index);
+			menuPanel.setMaxSteps(networks.size() - 1);
+			menuPanel.enableStart();
 			showGraph();
 			break;
 		case "play":
@@ -286,12 +292,14 @@ public class MainFrame implements ActionListener {
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
-					index++;
-					showGraph();
-					frame.pack();
-					if (index >= networks.size() - 1) {
+					if (index == networks.size() - 1) {
 						timer.cancel();
+						menuPanel.disableNext();
+						menuPanel.disablePause();
+						return;
 					}
+					showNextNetwork();
+					frame.pack();
 				}
 			}, 0, menuPanel.getDelay() * 1000);
 			menuPanel.disableStart();
@@ -301,6 +309,7 @@ public class MainFrame implements ActionListener {
 			timer.cancel();
 			menuPanel.enableStart();
 			menuPanel.disablePause();
+			break;
 		case "mode":
 			String mode = modeSelection.getMode();
 			if (mode == "run") {
@@ -313,15 +322,17 @@ public class MainFrame implements ActionListener {
 			}
 			this.frame.remove(modeSelection);
 			this.frame.pack();
+			break;
 		case "back":
 			menuPanel.restart();
 			index = networks.size() - 1;
 			visActivated = false;
 			showGraph();
+			break;
 		default:
 			break;
 		}
-		frame.pack();
+		packAndCenterFrame();
 
 		if (index > 0) {
 			menuPanel.enablePrevious();

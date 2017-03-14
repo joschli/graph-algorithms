@@ -5,7 +5,9 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import algorithms.BFSAll;
 import algorithms.FordFulkerson;
 import model.EdgePair;
 import model.Network;
@@ -58,7 +60,6 @@ public class GraphGenerator {
 
 		List<EdgePair> edges = generateEdges(nodes);
 		sortEdgesByDistance(edges);
-
 		EdgePair e = addEdge(lastGraph(graphs), edges);
 		while (e != null) {
 			Network g = cloneGraph(lastGraph(graphs));
@@ -66,6 +67,7 @@ public class GraphGenerator {
 			graphs.add(g);
 			e = addEdge(lastGraph(graphs), edges);
 		}
+		lastGraph(graphs).calculateEdgesForNode();
 		return graphs;
 	}
 
@@ -90,10 +92,10 @@ public class GraphGenerator {
 	private Network cloneGraph(Network graph) {
 		Network clone = new Network();
 		for (Node n : graph.getNodes()) {
-			clone.addNode(n);
+			clone.addNode(n.clone());
 		}
 		for (EdgePair e : graph.getEdgePairs()) {
-			clone.addEdgePair(e);
+			clone.addEdgePair(e.clone());
 		}
 		return clone;
 	}
@@ -101,10 +103,9 @@ public class GraphGenerator {
 	private boolean finalizeGraph(Network graph, int maxCapacity) {
 		setStartNode(graph);
 		setEndNode(graph);
-		if (!setEdgeDirections(graph)) {
+		if (setEdgeDirections(graph)) {
 			return false;
 		}
-
 		int tryCount = 0;
 		while (!validCapacityDistribution(graph)) {
 			if (tryCount == 5) {
@@ -133,7 +134,12 @@ public class GraphGenerator {
 		}
 
 		changeEdgeDirections(graph);
-		return validNodes(graph);
+		if (!validNodes(graph)) {
+			return false;
+		}
+		BFSAll bfs = new BFSAll(graph);
+		List<Node> reachableNodes = bfs.run();
+		return reachableNodes.size() == graph.getNodes().size();
 	}
 
 	private boolean validNodes(Network graph) {
@@ -197,20 +203,36 @@ public class GraphGenerator {
 	}
 
 	private boolean validCapacityDistribution(Network graph) {
-		graph.calculateEdgesForNode();
-		boolean valid = checkIndicentEdges(graph);
-		graph.clearCapacities();
-		return valid;
+		Network clonedGraph = cloneGraph(graph);
+		clonedGraph.calculateEdgesForNode();
+		List<EdgePair> fullEdges = checkIndicentEdges(clonedGraph);
+		if (fullEdges.isEmpty()) {
+			return true;
+		}
+
+		int maxFlow = calcMaxFlow(fullEdges, graph);
+		clonedGraph.clearCapacities();
+		for (EdgePair edgePair : fullEdges) {
+			clonedGraph.getEdgePairs().stream().filter((e) -> e.equals(edgePair)).collect(Collectors.toList()).get(0)
+					.setCapacity(edgePair.getCapacity() - 1);
+			int newMaxFlow = calcMaxFlow(checkIndicentEdges(clonedGraph), graph);
+			clonedGraph.clearCapacities();
+			if (newMaxFlow != maxFlow) {
+				return false;
+			}
+		}
+
+		return false;
+
 	}
 
-	private boolean validNodePlacement(Network graph) {
-		if (graph.getStartNode().equals(graph.getEndNode())) {
-			return false;
+	private int calcMaxFlow(List<EdgePair> fullEdges, Network graph) {
+		int maxFlow = 0;
+		for (EdgePair pair : fullEdges.stream().filter((e) -> e.contains(graph.getStartNode()))
+				.collect(Collectors.toList())) {
+			maxFlow += pair.getAvailableCapacity(false);
 		}
-		if (graph.getNeighbors(graph.getStartNode()).contains(graph.getEndNode())) {
-			return false;
-		}
-		return checkIfConnected(graph);
+		return maxFlow;
 	}
 
 	private void setEndNode(Network graph) {
@@ -240,20 +262,17 @@ public class GraphGenerator {
 		graph.setStartNode(min);
 	}
 
-	private boolean checkIndicentEdges(Network graph) {
+	private List<EdgePair> checkIndicentEdges(Network graph) {
 		FordFulkerson fordFulkerson = new FordFulkerson(graph);
 		List<EdgePair> result = fordFulkerson.run();
+		List<EdgePair> fullEdges = new ArrayList<>();
 		for (EdgePair edgePair : result) {
 			if ((edgePair.contains(graph.getStartNode()) || edgePair.contains(graph.getEndNode()))
 					&& ((edgePair.getAvailableCapacity(true) == 0))) {
-				return false;
+				fullEdges.add(edgePair);
 			}
 		}
-		return true;
-	}
-
-	private boolean checkIfConnected(Network graph) {
-		return new PathExists(graph, graph.getStartNode(), graph.getEndNode()).run();
+		return fullEdges;
 	}
 
 	private int getRandomCap(int maxCapacity) {
@@ -274,7 +293,7 @@ public class GraphGenerator {
 		}
 
 		for (Node n : graph.getNodes()) {
-			if (n == edge.bwEdge.getStart() || n == edge.bwEdge.getEnd()) {
+			if (n.equals(edge.fwEdge.getStart()) || n.equals(edge.fwEdge.getEnd())) {
 				continue;
 			}
 			if (edgeLine.ptLineDist(n.getPoint()) == 0.0) {
@@ -363,10 +382,6 @@ public class GraphGenerator {
 
 	private int getRandomNumber(int max) {
 		return (int) (Math.random() * (max - 100)) + 100;
-	}
-
-	private int getRandomIndex(int size) {
-		return (int) (Math.random() * (size)) + 0;
 	}
 
 	private double getDistance(EdgePair edge) {

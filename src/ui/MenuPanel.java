@@ -23,12 +23,16 @@ public class MenuPanel extends JPanel {
 	JButton previousButton;
 	JButton pauseButton;
 	JButton playButton;
+	JLabel stepLabel;
 
 	JButton generateButton;
 	JButton startButton;
 
 	JPanel nodeCountPanel;
 	JPanel delayPanel;
+
+	private int currentStep = 0;
+	private int maxSteps = 0;
 
 	public MenuPanel(MainFrame parent) {
 		generateButton = createButton("Generate", "generate", parent);
@@ -46,14 +50,14 @@ public class MenuPanel extends JPanel {
 		pauseButton.setVisible(false);
 		pauseButton.setEnabled(false);
 
-		String[] algorithms = { "zg", "EdmondsKarp", "FordFulkerson" , "Dinic" , "GoldbergTarjan" };
+		String[] algorithms = { "zg", "EdmondsKarp", "FordFulkerson", "Dinic", "GoldbergTarjan" };
 
 		algorithmSelection = new JComboBox<String>(algorithms);
 		algorithmSelection.setSelectedIndex(0);
 		algorithmSelection.addActionListener(parent);
 		JLabel nodeCountLabel = new JLabel("Nodes:");
 		nodeCountField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-		nodeCountField.setValue(new Long(7));
+		nodeCountField.setValue(new Long(10));
 		nodeCountField.setColumns(3);
 		JLabel capacityLabel = new JLabel("Capacity:");
 		capacityField = new JFormattedTextField(NumberFormat.getIntegerInstance());
@@ -76,6 +80,9 @@ public class MenuPanel extends JPanel {
 		delayPanel.add(delayField);
 		delayPanel.setVisible(false);
 
+		stepLabel = new JLabel(this.currentStep + "/" + this.maxSteps);
+		stepLabel.setVisible(false);
+
 		this.add(nodeCountPanel);
 		this.add(generateButton);
 		this.add(startButton);
@@ -86,6 +93,7 @@ public class MenuPanel extends JPanel {
 		this.add(pauseButton);
 		this.add(playButton);
 		this.add(nextButton);
+		this.add(stepLabel);
 
 		this.setMinimumSize(new Dimension((int) (0.2 * parent.getWidth()), parent.getHeight()));
 	}
@@ -137,6 +145,7 @@ public class MenuPanel extends JPanel {
 		delayPanel.setVisible(true);
 		pauseButton.setVisible(true);
 		backButton.setVisible(true);
+		stepLabel.setVisible(true);
 	}
 
 	public void restart() {
@@ -150,6 +159,7 @@ public class MenuPanel extends JPanel {
 		delayPanel.setVisible(false);
 		pauseButton.setVisible(false);
 		backButton.setVisible(false);
+		stepLabel.setVisible(false);
 	}
 
 	public void disableStart() {
@@ -170,6 +180,28 @@ public class MenuPanel extends JPanel {
 
 	public String getAlgorithm() {
 		return (String) algorithmSelection.getSelectedItem();
+	}
+
+	public int getCurrentStep() {
+		return currentStep;
+	}
+
+	public void setCurrentStep(int currentStep) {
+		this.currentStep = currentStep;
+		updateStepLabel();
+	}
+
+	private void updateStepLabel() {
+		this.stepLabel.setText(this.currentStep + "/" + this.maxSteps);
+	}
+
+	public int getMaxSteps() {
+		return maxSteps;
+	}
+
+	public void setMaxSteps(int maxSteps) {
+		this.maxSteps = maxSteps;
+		updateStepLabel();
 	}
 
 }
