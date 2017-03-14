@@ -55,8 +55,8 @@ public class Main {
 		 * e.printFlow(flow2);
 		 */
 		GraphGenerator generator = new GraphGenerator(10000, 10000, false);
-		TimedExecution exec = new TimedExecution((nodes) -> generator.generateGraph(250, 5));
-		// System.out.println(exec.run(1));
+		TimedExecution exec = new TimedExecution((nodes) -> generator.generateGraph(100, 5));
+		// System.out.println(exec.run(1000));
 		// Dinic d = new Dinic(g);
 		// List<EdgePair> flow = d.run();
 		// Network.printFlow(flow);
