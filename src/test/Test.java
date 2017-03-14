@@ -3,6 +3,7 @@ package test;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -29,9 +30,16 @@ public class Test {
 
 	public void run(String fileName) {
 		List<InstanceGroup> instances = new ArrayList<>();
-		Path file = Paths.get(fileName);
+
+		try {
+			Files.createDirectories(Paths.get("./logs/"));
+		} catch (IOException e1) {
+		}
+		Path file = Paths.get("./logs/" + fileName);
+		Path testFile = Paths.get("./logs/test_test_" + fileName);
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file.toFile(), true));
+			BufferedWriter testW = new BufferedWriter(new FileWriter(testFile.toFile(), true));
 		
 			for (Triplet t : triplets) {
 				instances.add(generateInstances(t));
@@ -49,7 +57,7 @@ public class Test {
 						// getName in algorithm impls
 						InstanceResult res = new InstanceResult(algorithm.getName(), result, algorithm.getGraph());
 						checkResultForValidity(res);
-						checkTestEnvironment(instance, algorithm);
+						checkTestEnvironment(res, testW, groupId, instanceId);
 						algoResults.add(res);
 					}
 					checkResultEquality(algoResults);
@@ -117,14 +125,14 @@ public class Test {
 	}
 
 	private void checkCapacityConstraints(InstanceResult result) {
-		List<EdgePair> edges = result.result;
+		List<EdgePair> edges = result.instance.getEdgePairs();
 		if(edges.stream().anyMatch(x -> (x.getCapacity() > x.getMaxCapacity() || x.getCapacity() < 0))){
 			result.addError(FlowError.createCapacityError());
 		}
 	}
 
 	private void checkFlowConstraints(InstanceResult result) {		
-		List<EdgePair> edges = result.result;
+		List<EdgePair> edges = result.instance.getEdgePairs();
 
 		int outflowStart = edges.stream().filter(x ->  (x.fwEdge.getStart().getId() == result.instance.getStartNode().getId())).map(x -> x.getCapacity()).reduce(0, Integer::sum);
 		int inflowEnd = edges.stream().filter(x ->  (x.fwEdge.getEnd().getId() == result.instance.getEndNode().getId())).map(x -> x.getCapacity()).reduce(0, Integer::sum);
@@ -147,8 +155,71 @@ public class Test {
 		
 	}
 
-	private void checkTestEnvironment(Network instance, AbstractMaxFlowAlgorithm algorithm) {
-		// TODO: change edge capacities, check for expected behavior
+	private void checkTestEnvironment(InstanceResult res, BufferedWriter testW, int groupId, int instanceId) throws IOException{
+		String s = "";
+		if(checkCapacityTest(res)){
+			s += "CAPACITY TEST: SUCCESS |";
+		}else{
+			s += "CAPACITY TEST: FAILURE |";
+		}
+		if(checkFlowTest(res)){
+			s += "FLOW TEST: SUCCESS |";
+		}else{
+			s += "FLOW TEST: FAILURE |";
+		}
+		if(checkSatCutTest(res)){
+			s += "SAT CUT TEST: SUCCESS |";
+		}else{
+			s += "SAT CUT TEST: FAILURE";
+		}
+		
+		testW.newLine();
+		testW.write("-------------------------------------------------");
+		testW.newLine();
+		testW.newLine();
+		testW.write(new Date().toString());
+		testW.newLine();
+		testW.write("GROUP: " + groupId);
+		testW.newLine();
+		testW.write("INSTANCE: " + instanceId);
+		testW.newLine();
+		testW.write(s);
+		testW.newLine();
+		testW.flush();
+	}
+
+	private boolean checkSatCutTest(InstanceResult res) {
+		InstanceResult testInstance = new InstanceResult(res.algorithm, res.result, res.instance.copy());
+		testInstance.instance.getEdgePairs().stream().forEach(x -> x.setActualCapacity(0));
+		checkSaturatedCut(testInstance);
+		if(!testInstance.isValid()){
+			return true;
+		}
+		return false;
+	}
+
+	private boolean checkFlowTest(InstanceResult res) {
+		InstanceResult testInstance = new InstanceResult(res.algorithm, res.result, res.instance.copy());
+		int randomIndex = ((int) (Math.random()*testInstance.instance.getEdgePairs().size()-3))+1;
+		int cap = testInstance.instance.getEdgePairs().get(randomIndex).getCapacity();
+		testInstance.instance.getEdgePairs().get(randomIndex).setActualCapacity(cap+1);;
+		
+		checkFlowConstraints(testInstance);
+		if(!testInstance.isValid()){
+			return true;
+		}
+		return false;
+	}
+
+	private boolean checkCapacityTest(InstanceResult res ) {
+		InstanceResult testInstance = new InstanceResult(res.algorithm, res.result, res.instance.copy());
+		EdgePair capError = testInstance.instance.getEdgePairs().get((int) (Math.random()*(testInstance.instance.getEdgePairs().size()-1)));
+		capError.setActualCapacity(capError.getMaxCapacity()+1);
+		checkCapacityConstraints(testInstance);
+		if(!testInstance.isValid()){
+			return true;
+		}
+		return false;
 	}
 
 	private InstanceGroup generateInstances(Triplet t) {

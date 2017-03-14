@@ -73,13 +73,13 @@ public class TestPanel extends JPanel implements ActionListener {
 
 		test.run(file);
 		try {
-			String s = Files.readAllLines(Paths.get(file)).stream().reduce("", (a, b) -> a + "\n" + b);
+			String s = Files.readAllLines(Paths.get("./logs/" + file)).stream().reduce("", (a, b) -> a + "\n" + b);
 			Color background = Color.green;
 			if (s.contains("NOT VALID")) {
 				background = Color.red;
 			}
 			result.setText("Test saved in: " + file + "\n"
-					+ Files.readAllLines(Paths.get("test.txt")).stream().reduce("", (a, b) -> a + "\n" + b));
+					+ s);
 			result.setBackground(background);
 		} catch (IOException e) {
 			e.printStackTrace();
