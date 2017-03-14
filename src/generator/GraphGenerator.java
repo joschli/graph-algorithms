@@ -178,7 +178,7 @@ public class GraphGenerator {
 		List<EdgePair> result = fordFulkerson.run();
 		for (EdgePair edgePair : result) {
 			if ((edgePair.contains(graph.getStartNode()) || edgePair.contains(graph.getEndNode()))
-					&& ((edgePair.getAvailableCapacity(true) == 0) || edgePair.getAvailableCapacity(false) == 0)) {
+					&& ((edgePair.getAvailableCapacity(true) == 0))) {
 				return false;
 			}
 		}
