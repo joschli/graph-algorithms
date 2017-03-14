@@ -8,9 +8,7 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,6 +22,7 @@ import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import generator.GraphGenerator;
@@ -111,20 +110,13 @@ public class MainFrame implements ActionListener {
 		});
 		graphPanel = new BasicVisualizationServer<Node, Edge>(layout);
 		graphPanel.setPreferredSize(new Dimension(this.viewPortWidth, this.viewPortHeight));
-		graphPanel.getRenderContext().setEdgeShapeTransformer(edge -> {
-			GeneralPath path = new GeneralPath();
-			path.reset();
-			path.moveTo(0.0f, 0.0f);
-			path.lineTo(0.0f, 3.f);
-			path.lineTo(1.0f, 3.f);
-			path.lineTo(1.0f, 1.0f);
-			return path;
-		});
+		graphPanel.getRenderContext().setEdgeShapeTransformer(new EdgeShape<Node, Edge>(graph).new Line());
 		graphPanel.getRenderContext().setEdgeDrawPaintTransformer(edge -> {
-			if(visActivated){
-				for(Edge e: visData.getHighlights().get(index)){
-					if((e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId()) ||
-							(e.getEnd().getId() == edge.getStart().getId() && e.getStart().getId() == edge.getEnd().getId())){
+			if (visActivated) {
+				for (Edge e : visData.getHighlights().get(index)) {
+					if ((e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId())
+							|| (e.getEnd().getId() == edge.getStart().getId()
+									&& e.getStart().getId() == edge.getEnd().getId())) {
 						return Color.red;
 					}
 				}
@@ -206,7 +198,7 @@ public class MainFrame implements ActionListener {
 				index = 0;
 			} else {
 				networks.get(index).calculateEdgesForNode();
-				EdmondsKarp ek= new EdmondsKarp(networks.get(index));
+				EdmondsKarp ek = new EdmondsKarp(networks.get(index));
 				ek.run();
 				visData = ek.getVisData();
 				networks = visData.getNetworks();

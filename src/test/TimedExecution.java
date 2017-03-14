@@ -1,5 +1,8 @@
 package test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.common.base.Function;
 
 public class TimedExecution<T, V> {
@@ -10,13 +13,23 @@ public class TimedExecution<T, V> {
 		this.func = func;
 	}
 
-	public long run(T input) {
+	public long time() {
 		long startTime = System.nanoTime();
-		func.apply(input);
+		func.apply(null);
 		long endTime = System.nanoTime();
 
 		long duration = (endTime - startTime) / 1000000;
 
 		return duration;
+	}
+
+	public double run(int iterations) {
+		List<Long> runTimes = new ArrayList<>();
+		for (int i = 0; i < 1; i++) {
+			runTimes.add(time());
+		}
+		double sum = runTimes.stream().reduce((long) 0, (a, b) -> a + b);
+		double avg = sum / runTimes.size();
+		return avg;
 	}
 }

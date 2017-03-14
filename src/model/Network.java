@@ -118,4 +118,8 @@ public class Network {
 		return neighbors;
 	}
 
+	public void clearCapacities() {
+		getEdgePairs().stream().forEach(e -> e.clearCapacity());
+	}
+
 }
