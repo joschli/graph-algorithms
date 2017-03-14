@@ -157,16 +157,29 @@ public class MainFrame implements ActionListener {
 			return "";
 		});
 		
+		
+		graphPanel.getRenderContext().setVertexDrawPaintTransformer(n -> {
+			if(visActivated){
+				if(visData.isGoldbergTarjan()){
+					if(visData.getCuts().get(index).contains(n)){
+						return Color.getHSBColor(0, 0.9f, 0.78f);
+					}
+				}
+			}
+			return Color.BLACK;
+		});
+		
 		graphPanel.getRenderContext().setVertexFillPaintTransformer(node -> {
 			if(visActivated){
 				if(visData.isGoldbergTarjan()){
 					if(node.equals(visData.getNodeHighlights().get(index))){
 						return Color.blue;
 					}
+					
 				}
 			}
 			if (network.getStartNode().equals(node)) {
-				return Color.green;
+				return Color.getHSBColor(0.4f, 0.9f, 0.41f);
 			}
 			if (network.getEndNode().equals(node)) {
 				return Color.red;
