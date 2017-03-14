@@ -72,7 +72,7 @@ public class Main {
 		List<EdgePair> flow = p.run();
 		Graph.printFlow(flow);*/
 
-		TestFactory.createBigTestCase().run("Test_Big.txt");
+		TestFactory.createBigTestCase().run("TEST_FINAL.txt");
 		}
 	
 	

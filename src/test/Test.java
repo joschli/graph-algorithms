@@ -67,6 +67,7 @@ public class Test {
 	private void log(BufferedWriter bw, int groupId, int instanceId, List<InstanceResult> algoResults) throws IOException{
 		bw.newLine();
 		bw.write("-------------------------------------------------------------------------------------");
+		bw.newLine();
 		bw.write(new Date().toString());
 		bw.newLine();
 		bw.write("GROUP: " + groupId);
