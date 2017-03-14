@@ -55,9 +55,9 @@ public class DFSForDinic {
 				increaseCurrentArc(v);
 			}else{
 			  path.addFirst(getCurrentArc(v));
-        availableCapacity.addFirst(Math.min(availableCapacity.peek(), getCurrentArc(v).getAvailableCapacity()));
-				visited[getCurrentArc(v).getEnd().getId()] = true;
-				s.addFirst(getCurrentArc(v).getEnd());
+			  availableCapacity.addFirst(Math.min(availableCapacity.peek(), getCurrentArc(v).getAvailableCapacity()));
+			  visited[getCurrentArc(v).getEnd().getId()] = true;
+			  s.addFirst(getCurrentArc(v).getEnd());
 			}
 		}
 	}

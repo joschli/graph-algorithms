@@ -46,7 +46,7 @@ public class MenuPanel extends JPanel {
 		pauseButton.setVisible(false);
 		pauseButton.setEnabled(false);
 
-		String[] algorithms = { "zg", "EdmondsKarp" };
+		String[] algorithms = { "zg", "EdmondsKarp", "FordFulkerson" , "Dinic" , "GoldbergTarjan" };
 
 		algorithmSelection = new JComboBox<String>(algorithms);
 		algorithmSelection.setSelectedIndex(0);

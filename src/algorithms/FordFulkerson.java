@@ -64,4 +64,8 @@ public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 		path.stream().forEach(x -> x.addCapacity(minCapacity));
 	}
 
+	public VisualizationData getVisData() {
+		return data;
+	}
+
 }

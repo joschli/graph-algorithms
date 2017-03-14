@@ -15,7 +15,10 @@ import java.util.TimerTask;
 
 import javax.swing.JFrame;
 
+import algorithms.Dinic;
 import algorithms.EdmondsKarp;
+import algorithms.FordFulkerson;
+import algorithms.PreflowPush;
 import algorithms.VisualizationData;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
@@ -26,6 +29,7 @@ import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import generator.GraphGenerator;
+import javafx.scene.text.Font;
 import model.Edge;
 import model.EdgePair;
 import model.Network;
@@ -113,13 +117,25 @@ public class MainFrame implements ActionListener {
 		graphPanel.getRenderContext().setEdgeShapeTransformer(new EdgeShape<Node, Edge>(graph).new Line());
 		graphPanel.getRenderContext().setEdgeDrawPaintTransformer(edge -> {
 			if (visActivated) {
-				for (Edge e : visData.getHighlights().get(index)) {
-					if ((e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId())
-							|| (e.getEnd().getId() == edge.getStart().getId()
-									&& e.getStart().getId() == edge.getEnd().getId())) {
-						return Color.red;
+				if(visData.hasSecondaryHighlights()){
+					for(Edge e : visData.getSecondaryHighlights().get(index)){
+						if ((e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId())
+								|| (e.getEnd().getId() == edge.getStart().getId()
+										&& e.getStart().getId() == edge.getEnd().getId())) {
+							return Color.cyan;
+						}
 					}
 				}
+				
+				for (Edge e : visData.getHighlights().get(index)) {
+					if ((e.getStart().getId() == edge.getStart().getId() && e.getEnd().getId() == edge.getEnd().getId())) {
+						return Color.red;
+					}
+					if((e.getEnd().getId() == edge.getStart().getId()
+									&& e.getStart().getId() == edge.getEnd().getId())){
+						return Color.orange;
+					}
+				}				
 			}
 			return Color.black;
 		});
@@ -131,7 +147,24 @@ public class MainFrame implements ActionListener {
 		// }
 		// return new ToStringLabeller().apply(n);
 		// });
+		
+		graphPanel.getRenderContext().setVertexLabelTransformer(n -> {
+			if(visActivated){
+				if(visData.isGoldbergTarjan()){
+					return "<html><font color='white'><b>"+  Integer.toString(visData.getNodeLabels().get(index)[n.getId()])+ "</b></font></html>";
+				}
+			}
+			return "";
+		});
+		
 		graphPanel.getRenderContext().setVertexFillPaintTransformer(node -> {
+			if(visActivated){
+				if(visData.isGoldbergTarjan()){
+					if(node.equals(visData.getNodeHighlights().get(index))){
+						return Color.blue;
+					}
+				}
+			}
 			if (network.getStartNode().equals(node)) {
 				return Color.green;
 			}
@@ -205,11 +238,43 @@ public class MainFrame implements ActionListener {
 			menuPanel.start();
 			if (menuPanel.getAlgorithm() == "zg") {
 				index = 0;
-			} else {
+			} else if(menuPanel.getAlgorithm().equals("EdmondsKarp")){
 				networks.get(index).calculateEdgesForNode();
 				EdmondsKarp ek = new EdmondsKarp(networks.get(index));
+				ek.setVisualization(true);
 				ek.run();
 				visData = ek.getVisData();
+				networks = visData.getNetworks();
+				index = 0;
+				visActivated = true;
+			}else if(menuPanel.getAlgorithm().equals("FordFulkerson")){
+				System.out.println("FORD FULKERSON");
+				networks.get(index).calculateEdgesForNode();
+				FordFulkerson ff = new FordFulkerson(networks.get(index));
+				ff.setVisualization(true);
+				ff.run();
+				visData = ff.getVisData();
+				networks = visData.getNetworks();
+				index = 0;
+				visActivated = true;
+			}else if(menuPanel.getAlgorithm().equals("Dinic")){
+				System.out.println("DINIC");
+				networks.get(index).calculateEdgesForNode();
+				Dinic d = new Dinic(networks.get(index));
+				d.setVisualization(true);
+				List<EdgePair> flow = d.run();
+				Network.printFlow(flow);
+				visData = d.getVisData();
+				networks = visData.getNetworks();
+				index = 0;
+				visActivated = true;
+			}else if(menuPanel.getAlgorithm().equals("GoldbergTarjan")){
+				System.out.println("GOLDBERG TARJAN");
+				networks.get(index).calculateEdgesForNode();
+				PreflowPush pp = new PreflowPush(networks.get(index));
+				pp.setVisualization(true);
+				pp.run();
+				visData = pp.getVisData();
 				networks = visData.getNetworks();
 				index = 0;
 				visActivated = true;

@@ -60,6 +60,7 @@ public class BFS {
 		for(Edge e = pathToNode[n.getId()]; e != null; e = pathToNode[e.getStart().getId()]){
 			path.addFirst(e);
 		}
+		
 		return path;
 	}
 	
@@ -124,7 +125,7 @@ public class BFS {
 	}
 	
 	private List<Edge> getEdges(){
-	  LinkedList<Edge> s = edgesForNode[graph.getEndNode().getId()];
+	  LinkedList<Edge> s = new LinkedList<Edge>(edgesForNode[graph.getEndNode().getId()]);
 	  LinkedList<Edge> withoutDuplicates = new LinkedList<Edge>();
 	  boolean[][] exists = new boolean[graph.getHighestIndex()+1][graph.getHighestIndex()+1];
 	  

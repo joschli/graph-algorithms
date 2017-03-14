@@ -1,6 +1,9 @@
 
 import java.util.Arrays;
+import java.util.List;
 
+import algorithms.Dinic;
+import algorithms.PreflowPush;
 import model.EdgePair;
 import model.Network;
 import model.Node;
@@ -52,10 +55,14 @@ public class Main {
 		 * EdmondsKarp e = new EdmondsKarp(g1); List<EdgePair> flow2 = e.run();
 		 * e.printFlow(flow2);
 		 */
-		// Dinic d = new Dinic(g);
-		// List<EdgePair> flow = d.run();
-		// Network.printFlow(flow);
+		//Dinic d = new Dinic(g);
+		//List<EdgePair> flow = d.run();
+		//Network.printFlow(flow);
+		
+		PreflowPush p = new PreflowPush(g);
+		List<EdgePair> flow = p.run();
+		Network.printFlow(flow);
 
-		MainFrame frame = new MainFrame(3800, 2000);
+		MainFrame frame = new MainFrame(2500, 1900);
 	}
 }

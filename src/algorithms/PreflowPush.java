@@ -63,11 +63,12 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	              s.addFirst(edge.getEnd());
 	            });
 		
+		
 		if(visualization){
 			visData = new VisualizationData();
 			visData.addNetwork(graph.copy());
 			visData.addNodeHighlight(null);
-			visData.addNobeLabels(d);
+			visData.addNobeLabels(d.clone());
 			visData.addPath(new ArrayList<Edge>());
 			visData.addLabel("After Initialization");
 			visData.setGoldbergTarjan(true);
@@ -106,7 +107,7 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	  	        }
 	  	        if(visualization){
 		  	        visData.addLabel("Pushed " + min + " capacity on Edge");
-		  	        visData.addNobeLabels(d);
+		  	        visData.addNobeLabels(d.clone());
 		  	        visData.addNetwork(graph.copy());
 		  	        visData.addNodeHighlight(null);
 		  	        visData.addPath(Arrays.asList(getCurrentArc(v)));
@@ -122,7 +123,7 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 		        
 		        if(visualization){
 		        	visData.addNetwork(graph.copy());
-			        visData.addNobeLabels(d);
+			        visData.addNobeLabels(d.clone());
 			        visData.addNodeHighlight(v);
 			        visData.addPath(new ArrayList<Edge>());
 			        visData.addCut(findCut());
@@ -171,5 +172,9 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	 private void resetCurrentArc(Node n){
 	  currentArc[n.getId()] =0;
 	 }
+
+	public VisualizationData getVisData() {
+		return visData;
+	}
 
 }
