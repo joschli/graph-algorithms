@@ -31,6 +31,11 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 		visualization = b;
 	}
 	
+	@Override
+	public Network getGraph(){
+		return graph;
+	}
+	
 	@Override 
 	public String getName(){
 		return "Preflow-Push";

@@ -22,6 +22,11 @@ public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 		visualization = b;
 	}
 	
+	@Override
+	public Network getGraph(){
+		return g;
+	}
+	
 	@Override 
 	public String getName(){
 		return "Ford-Fulkerson";

@@ -65,6 +65,10 @@ public class EdgePair {
 	public int getCapacity() {
 		return capacity;
 	}
+	
+	public int getMaxCapacity(){
+		return maxCapacity;
+	}
 
 	@Override
 	public boolean equals(Object other) {

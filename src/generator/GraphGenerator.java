@@ -214,7 +214,7 @@ public class GraphGenerator {
 		clonedGraph.clearCapacities();
 		for (EdgePair edgePair : fullEdges) {
 			clonedGraph.getEdgePairs().stream().filter((e) -> e.equals(edgePair)).collect(Collectors.toList()).get(0)
-					.setCapacity(edgePair.getCapacity() - 1);
+					.setCapacity(edgePair.getMaxCapacity() - 1);
 			int newMaxFlow = calcMaxFlow(checkIndicentEdges(clonedGraph), graph);
 			clonedGraph.clearCapacities();
 			if (newMaxFlow != maxFlow) {

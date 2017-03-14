@@ -6,6 +6,7 @@ import java.util.List;
 import algorithms.Dinic;
 import algorithms.EdmondsKarp;
 import algorithms.SimpleGraph;
+import test.TestFactory;
 import algorithms.FordFulkerson;
 import algorithms.PreflowPush;
 import ui.MainFrame;
@@ -15,7 +16,7 @@ public class Main {
 
 	
 	public static void main(String[] args) {
-	  
+	  /*
 		Node n0 = new Node();
 		Node n1 = new Node();
 		Node n2 = new Node();
@@ -53,7 +54,7 @@ public class Main {
 		Arrays.asList(e9, e10, e11, e12, e13).stream().forEach(edge -> g2.addEdgePair(edge));
 		Arrays.asList(n6, n7, n8, n9).stream().forEach(n -> g2.addNode(n));
 		g2.calculateEdgesForNode();
-
+*/
 		
 		/*FordFulkerson f = new FordFulkerson(g);
 		List<EdgePair> flow = f.run();
@@ -63,15 +64,16 @@ public class Main {
 		List<EdgePair> flow = e.run();
 		g.printFlow(flow);
 		*/
-		Dinic d = new Dinic(g);
+		/*Dinic d = new Dinic(g);
 		List<EdgePair> flow = d.run();
 		Network.printFlow(flow);
-		
+		*/
 		/*PreflowPush p = new PreflowPush(g);
 		List<EdgePair> flow = p.run();
 		Graph.printFlow(flow);*/
 
-	}
+		TestFactory.createBigTestCase().run("Test_Big.txt");
+		}
 	
 	
 	
