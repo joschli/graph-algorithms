@@ -69,7 +69,7 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 			visData.addNetwork(graph.copy());
 			visData.addNodeHighlight(null);
 			visData.addNobeLabels(d.clone());
-			visData.addPath(new ArrayList<Edge>());
+			visData.addPath(graph.getEdgesForNode(graph.getStartNode()));
 			visData.addLabel("After Initialization");
 			visData.setGoldbergTarjan(true);
 			visData.addCut(Arrays.asList(graph.getStartNode()));
@@ -86,10 +86,9 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	private void iterate(){
 	    while(!s.isEmpty()){
 	      Node v = s.peek();
-	      if(getCurrentArc(v) != null && !isAdmissible(getCurrentArc(v))){
+	      if(getCurrentArc(v) != null && (!isAdmissible(getCurrentArc(v)) || getCurrentArc(v).getAvailableCapacity() == 0 )){
 	    	  	increaseCurrentArc(v);
 	      }else if(getCurrentArc(v) != null && getCurrentArc(v).getAvailableCapacity() != 0 && isAdmissible(getCurrentArc(v))){
-	    	  
 		        int w_id = getCurrentArc(v).getEnd().getId();
 		        if(w_id != graph.getStartNode().getId() && w_id != graph.getEndNode().getId() && getExcess(w_id) == 0){
 		  	       s.addLast(getCurrentArc(v).getEnd());
@@ -133,7 +132,7 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	}
 	
 	private List<Node> findCut(){
-		BFSAll bfs = new BFSAll(graph);
+		BFSAll bfs = new BFSAll(graph.copy());
 		return bfs.run();
 	}
 	
@@ -170,7 +169,7 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	}
   
 	 private void resetCurrentArc(Node n){
-	  currentArc[n.getId()] =0;
+	  currentArc[n.getId()] = 0;
 	 }
 
 	public VisualizationData getVisData() {
