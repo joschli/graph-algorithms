@@ -11,10 +11,14 @@ public class EdgePair {
 	public Edge fwEdge;
 	public Edge bwEdge;
 
+	private Node start;
+	private Node end;
+
 	public EdgePair(Node start, Node end, int maxCapacity) {
 		this.maxCapacity = maxCapacity;
 		this.capacity = 0;
-
+		this.start = start;
+		this.end = end;
 		this.fwEdge = new Edge(start, end, true, this);
 		this.bwEdge = new Edge(end, start, false, this);
 	}
@@ -47,14 +51,14 @@ public class EdgePair {
 	public List<Edge> getEdges() {
 		return Arrays.asList(fwEdge, bwEdge);
 	}
-	
-	public EdgePair clone(){
-		EdgePair copy =  new EdgePair(fwEdge.getStart().clone(), fwEdge.getEnd().clone(), maxCapacity);
+
+	public EdgePair clone() {
+		EdgePair copy = new EdgePair(fwEdge.getStart().clone(), fwEdge.getEnd().clone(), maxCapacity);
 		copy.setActualCapacity(this.capacity);
 		return copy;
 	}
-	
-	public void setActualCapacity(int amount){
+
+	public void setActualCapacity(int amount) {
 		this.capacity = amount;
 	}
 
@@ -75,5 +79,17 @@ public class EdgePair {
 
 	public boolean contains(Node n) {
 		return fwEdge.getStart().equals(n) || fwEdge.getEnd().equals(n);
+	}
+
+	public void invert() {
+		this.fwEdge = new Edge(end, start, true, this);
+		this.bwEdge = new Edge(start, end, false, this);
+	}
+
+	public Node getOtherNode(Node n) {
+		if (start.equals(n)) {
+			return end;
+		}
+		return start;
 	}
 }

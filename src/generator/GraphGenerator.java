@@ -101,7 +101,7 @@ public class GraphGenerator {
 	private boolean finalizeGraph(Network graph, int maxCapacity) {
 		setStartNode(graph);
 		setEndNode(graph);
-		if (!validNodePlacement(graph)) {
+		if (!setEdgeDirections(graph)) {
 			return false;
 		}
 
@@ -116,6 +116,73 @@ public class GraphGenerator {
 		}
 
 		return true;
+	}
+
+	private boolean setEdgeDirections(Network graph) {
+
+		for (EdgePair pair : graph.getEdgePairsForNode(graph.getStartNode())) {
+			if (!graph.getStartNode().equals(pair.fwEdge.getStart())) {
+				pair.invert();
+			}
+		}
+
+		for (EdgePair pair : graph.getEdgePairsForNode(graph.getEndNode())) {
+			if (!graph.getEndNode().equals(pair.fwEdge.getEnd())) {
+				pair.invert();
+			}
+		}
+
+		changeEdgeDirections(graph);
+		return validNodes(graph);
+	}
+
+	private boolean validNodes(Network graph) {
+		boolean valid = true;
+		for (Node n : graph.getNodes()) {
+			if (n.equals(graph.getStartNode()) || n.equals(graph.getEndNode())) {
+				continue;
+			}
+
+			List<EdgePair> edges = graph.getEdgePairsForNode(n);
+
+			valid = validNodeEdges(n, edges) && valid;
+		}
+		return valid;
+	}
+
+	private void changeEdgeDirections(Network graph) {
+		for (Node n : graph.getNodes()) {
+			if (n.equals(graph.getStartNode()) || n.equals(graph.getEndNode())) {
+				continue;
+			}
+
+			List<EdgePair> edges = graph.getEdgePairsForNode(n);
+
+			if (validNodeEdges(n, edges)) {
+				continue;
+			}
+
+			for (EdgePair pair : edges) {
+				if (!pair.contains(graph.getEndNode()) && !pair.contains(graph.getStartNode())) {
+					pair.invert();
+					if (checkOtherNodeStillValid(n, pair, graph)) {
+						break;
+					}
+					pair.invert();
+					continue;
+				}
+			}
+		}
+	}
+
+	private boolean checkOtherNodeStillValid(Node n, EdgePair pair, Network graph) {
+		Node otherNode = pair.getOtherNode(n);
+		return validNodeEdges(otherNode, graph.getEdgePairsForNode(otherNode));
+	}
+
+	private boolean validNodeEdges(Node n, List<EdgePair> edges) {
+		return edges.stream().anyMatch((e) -> e.fwEdge.getStart().equals(n))
+				&& edges.stream().anyMatch((e) -> e.fwEdge.getEnd().equals(n));
 	}
 
 	private void distributeCapacities(Network graph, int maxCapacity) {
@@ -296,6 +363,10 @@ public class GraphGenerator {
 
 	private int getRandomNumber(int max) {
 		return (int) (Math.random() * (max - 100)) + 100;
+	}
+
+	private int getRandomIndex(int size) {
+		return (int) (Math.random() * (size)) + 0;
 	}
 
 	private double getDistance(EdgePair edge) {

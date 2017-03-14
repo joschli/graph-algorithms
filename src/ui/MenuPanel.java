@@ -18,6 +18,7 @@ public class MenuPanel extends JPanel {
 
 	JComboBox<String> algorithmSelection;
 
+	JButton backButton;
 	JButton nextButton;
 	JButton previousButton;
 	JButton pauseButton;
@@ -36,9 +37,11 @@ public class MenuPanel extends JPanel {
 		nextButton = createButton(">", "next", parent);
 		playButton = createButton("|>", "play", parent);
 		pauseButton = createButton("||", "pause", parent);
+		backButton = createButton("back", "back", parent);
 
 		playButton.setVisible(false);
 		previousButton.setVisible(false);
+		backButton.setVisible(false);
 		nextButton.setVisible(false);
 		pauseButton.setVisible(false);
 		pauseButton.setEnabled(false);
@@ -50,7 +53,7 @@ public class MenuPanel extends JPanel {
 		algorithmSelection.addActionListener(parent);
 		JLabel nodeCountLabel = new JLabel("Nodes:");
 		nodeCountField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-		nodeCountField.setValue(new Long(5));
+		nodeCountField.setValue(new Long(7));
 		nodeCountField.setColumns(3);
 		JLabel capacityLabel = new JLabel("Capacity:");
 		capacityField = new JFormattedTextField(NumberFormat.getIntegerInstance());
@@ -77,6 +80,7 @@ public class MenuPanel extends JPanel {
 		this.add(generateButton);
 		this.add(startButton);
 		this.add(algorithmSelection);
+		this.add(backButton);
 		this.add(delayPanel);
 		this.add(previousButton);
 		this.add(pauseButton);
@@ -132,6 +136,20 @@ public class MenuPanel extends JPanel {
 		algorithmSelection.setVisible(false);
 		delayPanel.setVisible(true);
 		pauseButton.setVisible(true);
+		backButton.setVisible(true);
+	}
+
+	public void restart() {
+		generateButton.setVisible(true);
+		startButton.setVisible(true);
+		nodeCountPanel.setVisible(true);
+		playButton.setVisible(false);
+		previousButton.setVisible(false);
+		nextButton.setVisible(false);
+		algorithmSelection.setVisible(true);
+		delayPanel.setVisible(false);
+		pauseButton.setVisible(false);
+		backButton.setVisible(false);
 	}
 
 	public void disableStart() {

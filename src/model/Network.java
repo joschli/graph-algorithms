@@ -124,4 +124,14 @@ public class Network {
 		getEdgePairs().stream().forEach(e -> e.clearCapacity());
 	}
 
+	public List<EdgePair> getEdgePairsForNode(Node n) {
+		List<EdgePair> edgePairs = new ArrayList<>();
+		for (EdgePair pair : edges) {
+			if (pair.contains(n)) {
+				edgePairs.add(pair);
+			}
+		}
+		return edgePairs;
+	}
+
 }

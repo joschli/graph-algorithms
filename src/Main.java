@@ -1,12 +1,9 @@
 
-
 import java.util.Arrays;
 
-import generator.GraphGenerator;
 import model.EdgePair;
 import model.Network;
 import model.Node;
-import test.TimedExecution;
 import ui.MainFrame;
 
 public class Main {
@@ -55,9 +52,6 @@ public class Main {
 		 * EdmondsKarp e = new EdmondsKarp(g1); List<EdgePair> flow2 = e.run();
 		 * e.printFlow(flow2);
 		 */
-		/*GraphGenerator generator = new GraphGenerator(10000, 10000, false);
-		TimedExecution exec = new TimedExecution((nodes) -> generator.generateGraph(100, 5));*/
-		// System.out.println(exec.run(1000));
 		// Dinic d = new Dinic(g);
 		// List<EdgePair> flow = d.run();
 		// Network.printFlow(flow);

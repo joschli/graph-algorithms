@@ -123,13 +123,22 @@ public class MainFrame implements ActionListener {
 			}
 			return Color.black;
 		});
-		graphPanel.getRenderContext().setVertexLabelTransformer(n -> {
-			if (network.getStartNode().getId() == n.getId()) {
-				return "s";
-			} else if (network.getEndNode().getId() == n.getId()) {
-				return "t";
+		// graphPanel.getRenderContext().setVertexLabelTransformer(n -> {
+		// if (network.getStartNode().getId() == n.getId()) {
+		// return "s";
+		// } else if (network.getEndNode().getId() == n.getId()) {
+		// return "t";
+		// }
+		// return new ToStringLabeller().apply(n);
+		// });
+		graphPanel.getRenderContext().setVertexFillPaintTransformer(node -> {
+			if (network.getStartNode().equals(node)) {
+				return Color.green;
 			}
-			return new ToStringLabeller().apply(n);
+			if (network.getEndNode().equals(node)) {
+				return Color.red;
+			}
+			return Color.gray;
 		});
 		graphPanel.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
 		graphPanel.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
@@ -239,6 +248,11 @@ public class MainFrame implements ActionListener {
 			}
 			this.frame.remove(modeSelection);
 			this.frame.pack();
+		case "back":
+			menuPanel.restart();
+			index = networks.size() - 1;
+			visActivated = false;
+			showGraph();
 		default:
 			break;
 		}
