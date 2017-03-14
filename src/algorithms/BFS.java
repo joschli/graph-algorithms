@@ -13,7 +13,7 @@ public class BFS {
 	private boolean[] visited;
 	private int[] currentArc;
 	private int[] availableCapacity; 
-	private LinkedList<Edge>[] pathToNode;
+	private Edge[] pathToNode;
 	
 	//DINIC SPEZIELL
 	private int[] level;
@@ -52,13 +52,22 @@ public class BFS {
 	public List<Edge> run(){
 		init();
 		iterate();
-		return pathToNode[graph.getEndNode().getId()];
+		return getPath();
+	}
+	
+	private List<Edge> getPath(){
+		LinkedList<Edge> path = new LinkedList<Edge>();
+		Node n = graph.getEndNode();
+		for(Edge e = pathToNode[n.getId()]; e != null; e = pathToNode[e.getStart().getId()]){
+			path.addFirst(e);
+		}
+		return path;
 	}
 	
 	private void init(){
 		s = new LinkedList<Node>();
 		availableCapacity = new int[graph.getHighestIndex()+1];
-		pathToNode = new LinkedList[graph.getHighestIndex()+1];
+		pathToNode = new Edge[graph.getHighestIndex()+1];
 		visited = new boolean[graph.getHighestIndex()+1];
 		currentArc = new int[graph.getHighestIndex()+1];
 		
@@ -74,7 +83,6 @@ public class BFS {
 					visited[x.getId()] = false;
 					currentArc[x.getId()] = 0;
 					level[x.getId()] = Integer.MAX_VALUE;
-					pathToNode[x.getId()] = new LinkedList<Edge>();
 					edgesForNode[x.getId()] = new LinkedList<Edge>();});
 		visited[graph.getStartNode().getId()] = true;
     level[graph.getStartNode().getId()] = 0;
@@ -89,7 +97,7 @@ public class BFS {
 				increaseCurrentArc(v);
 			}else{
 				availableCapacity[getCurrentArc(v).getEnd().getId()] = appendCapacity(v);
-				pathToNode[getCurrentArc(v).getEnd().getId()] =  appendPath(v);
+				pathToNode[getCurrentArc(v).getEnd().getId()] =  getCurrentArc(v);
 				setVisited(getCurrentArc(v).getEnd());
 				s.addLast(getCurrentArc(v).getEnd());
 			}
@@ -101,11 +109,6 @@ public class BFS {
 		return Math.min(availableCapacity[n.getId()], getCurrentArc(n).getAvailableCapacity());
 	}
 	
-	private LinkedList<Edge> appendPath(Node n){
-		LinkedList<Edge> path = pathToNode[n.getId()];
-		path.addLast(getCurrentArc(n));
-		return path;	
-	}
 	
 
 	public int getAvailableCapacity(){

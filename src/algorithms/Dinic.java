@@ -1,5 +1,6 @@
 package algorithms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import model.Edge;
@@ -9,7 +10,8 @@ import model.Network;
 public class Dinic extends AbstractMaxFlowAlgorithm {
 
 	private Network g;
-
+	private VisualizationData data;
+	
 	public Dinic(Network g) {
 		this.g = g;
 	}
@@ -19,12 +21,19 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 		init();
 		List<Edge> subgraph;
 		while ((subgraph = findSubgraph()).size() != 0) {
+			data.addPath(subgraph);
 			createAndAddBlockingFlow(subgraph);
+			data.addNetwork(g.copy());
 		}
 		return g.getEdgePairs();
 	}
 
 	private void init() {
+		data = new VisualizationData();
+		data.addNetwork(g.copy());
+		data.addPath(new ArrayList<Edge>());
+		data.addSecondaryHighlight(new ArrayList<Edge>());
+		data.setSecondaryHighlights(true);
 		g.getEdgePairs().stream().forEach(e -> e.clearCapacity());
 	}
 
