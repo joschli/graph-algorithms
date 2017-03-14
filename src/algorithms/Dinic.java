@@ -12,9 +12,15 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 
 	private Network g;
 	private VisualizationData data;
+	private boolean visualization = false;
 	
 	public Dinic(Network g) {
 		this.g = g;
+	}
+	
+
+	public void setVisualization(boolean b){
+		visualization = b;
 	}
 
 	@Override 
@@ -26,22 +32,25 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 		init();
 		List<Edge> subgraph;
 		while ((subgraph = findSubgraph()).size() != 0) {
-			data.addPath(subgraph);
 			createAndAddBlockingFlow(subgraph);
-			data.addNetwork(g.copy());
+			if(visualization){
+				data.addNetwork(g.copy());
+				data.addPath(subgraph);
+			}
 		}
 		return g.getEdgePairs();
 	}
 
 	private void init() {
 		g.getEdgePairs().stream().forEach(e -> e.clearCapacity());
-
-		data = new VisualizationData();
-		data.addNetwork(g.copy());
-		data.addPath(new ArrayList<Edge>());
-		data.addSecondaryHighlight(new ArrayList<Edge>());
-		data.setSecondaryHighlights(true);
-		data.addLabel("After Initialization");
+		if(visualization){
+			data = new VisualizationData();
+			data.addNetwork(g.copy());
+			data.addPath(new ArrayList<Edge>());
+			data.addSecondaryHighlight(new ArrayList<Edge>());
+			data.setSecondaryHighlights(true);
+			data.addLabel("After Initialization");
+		}
 	}
 
 	private List<Edge> findSubgraph() {
@@ -65,8 +74,10 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 				sg.removeEdge(x);
 			});
 		}
-		data.addLabel("Shortest Path Subgraph with Blocking Flow");
-		data.addSecondaryHighlight(secondaryHighlight);
+		if(visualization){
+			data.addLabel("Shortest Path Subgraph with Blocking Flow");
+			data.addSecondaryHighlight(secondaryHighlight);
+		}
 
 	}
 

@@ -11,9 +11,15 @@ public class EdmondsKarp extends AbstractMaxFlowAlgorithm {
 	private Network g;
 	private int minCapacity;
 	private VisualizationData data;
+	private boolean visualization;
 	
 	public EdmondsKarp(Network g){
 		this.g = g;
+	}
+	
+
+	public void setVisualization(boolean b){
+		visualization = b;
 	}
 	
 	@Override 
@@ -26,21 +32,24 @@ public class EdmondsKarp extends AbstractMaxFlowAlgorithm {
 		init();
 		List<Edge> path; 
 		while((path = findNewFlowAugmentingPath()).size() > 0){
-			data.addPath(path);
 			increaseFlow(path);
-			data.addNetwork(g.copy());
-			data.addLabel("Augmenting Shortest Path got augmented with" + minCapacity + " capacity");
+			if(visualization){
+				data.addPath(path);
+				data.addNetwork(g.copy());
+				data.addLabel("Augmenting Shortest Path got augmented with" + minCapacity + " capacity");
+			}
 		}
 		return g.getEdgePairs();
 	}
 	
 	private void init(){
-		data = new VisualizationData();
 		g.getEdgePairs().stream().forEach(e -> e.clearCapacity());
-
-		data.addNetwork(g.copy());
-		data.addPath(new ArrayList<Edge>());
-		data.addLabel("After Initialization");
+		if(visualization){
+			data = new VisualizationData();
+			data.addNetwork(g.copy());
+			data.addPath(new ArrayList<Edge>());
+			data.addLabel("After Initialization");
+		}
 	}
 	
 	private List<Edge> findNewFlowAugmentingPath(){

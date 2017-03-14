@@ -36,11 +36,6 @@ public class BFSPreflowPush {
 
     s.add(start);
     distance[start.getId()] = 0;
-    graph.getNodes()
-        .stream()
-        .forEach(x -> {
-          visited[x.getId()] = false;
-          currentArc[x.getId()] = 0;});
     visited[start.getId()] = true;
   }
   

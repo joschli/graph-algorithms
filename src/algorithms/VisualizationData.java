@@ -13,10 +13,10 @@ public class VisualizationData {
  * Dinic: Testen mit hatSecondaryHighlights ob Dinic, zusätzlich zu den obigen noch secondaryHighlights als Zweite List<Edge> am besten in anderer Farbe
  * Preflow-Push: Mit goldberg testen ob ist, benutzt highlights, labels, graphs, nodelabels (für Beschriftung der Nodes nach Höhe), nodeHighlights zum Highlighten einzelner Nodes
  * 						=> NodeHighlight ist entweder null oder eine Node die gehighlightet werden soll, highlihgts ist entweder leere Liste oder eine einzelne Edge
+ * 				=> Außerdem cuts => Gruppe von Nodes die zur einen Hälfte des Cuts gehören, iwie highlighten bei jedem Schritt
  * 
  * 
  */
-	
 	
 	private List<Network> graphs;
 	private List<List<Edge>> highlights;
@@ -24,6 +24,7 @@ public class VisualizationData {
 	private List<Node> nodeHighlight;
 	private List<int[]> nodeLabels;
 	private List<String> labels;
+	private List<List<Node>> cuts;
 	
 	private boolean goldberg = false;
 	private boolean hasSecondaryHighlights = false;
@@ -34,6 +35,8 @@ public class VisualizationData {
 		secondaryHighlights = new ArrayList<List<Edge>>();
 		nodeHighlight = new ArrayList<Node>();
 		nodeLabels = new ArrayList<int[]>();
+		cuts = new ArrayList<List<Node>>();
+		labels = new ArrayList<String>();
 	}
 	
 	public void addNetwork(Network n){
@@ -98,6 +101,13 @@ public class VisualizationData {
 	
 	public List<Node> getNodeHighlights(){
 		return nodeHighlight;
+	}
+	public void addCut(List<Node> cut){
+		cuts.add(cut);
+	}
+	
+	public List<List<Node>> getCuts(){
+		return cuts;
 	}
 	
 }

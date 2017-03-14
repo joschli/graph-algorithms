@@ -21,9 +21,14 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
   private LinkedList<Node> s;
   
 	private Network graph;
+	private boolean visualization = false;
 
 	public PreflowPush(Network g) {
 		this.graph = g;
+	}
+	
+	public void setVisualization(boolean b){
+		visualization = b;
 	}
 	
 	@Override 
@@ -48,12 +53,6 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 		d = computeValidDistanceLabeling();
 		d[graph.getStartNode().getId()] = graph.getNodes().size();
 		d[graph.getEndNode().getId()] = 0;
-		graph.getNodes()
-	        .stream()
-	        .forEach(x -> {
-	                currentArc[x.getId()]= 0;
-	                excess[x.getId()]= 0;
-	               });
 	
 		graph.getEdgePairs().stream().forEach(e -> e.clearCapacity());
 		graph.getEdgesForNode(graph.getStartNode())
@@ -64,14 +63,16 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	              s.addFirst(edge.getEnd());
 	            });
 		
-
-		visData = new VisualizationData();
-		visData.addNetwork(graph.copy());
-		visData.addNodeHighlight(null);
-		visData.addNobeLabels(d);
-		visData.addPath(new ArrayList<Edge>());
-		visData.addLabel("After Initialization");
-		visData.setGoldbergTarjan(true);
+		if(visualization){
+			visData = new VisualizationData();
+			visData.addNetwork(graph.copy());
+			visData.addNodeHighlight(null);
+			visData.addNobeLabels(d);
+			visData.addPath(new ArrayList<Edge>());
+			visData.addLabel("After Initialization");
+			visData.setGoldbergTarjan(true);
+			visData.addCut(Arrays.asList(graph.getStartNode()));
+		}
 	}
 	
 	
@@ -85,37 +86,54 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	    while(!s.isEmpty()){
 	      Node v = s.peek();
 	      if(getCurrentArc(v) != null && !isAdmissible(getCurrentArc(v))){
-	        increaseCurrentArc(v);
+	    	  	increaseCurrentArc(v);
 	      }else if(getCurrentArc(v) != null && getCurrentArc(v).getAvailableCapacity() != 0 && isAdmissible(getCurrentArc(v))){
-	        int w_id = getCurrentArc(v).getEnd().getId();
-	        if(w_id != graph.getStartNode().getId() && w_id != graph.getEndNode().getId() && getExcess(w_id) == 0){
-	  	         s.addLast(getCurrentArc(v).getEnd());
-  	        }
-  	        //Increase Flow over (v,w) by
-  	        int min = Math.min(getExcess(v.getId()), getCurrentArc(v).getAvailableCapacity());
-  	        getCurrentArc(v).addCapacity(min);
-  	        //Increase Excess of w by min and decrease excess of f by that value
-  	        increaseExcess(w_id, min);
-  	        decreaseExcess(v.getId(), min);
-  	        if(getExcess(v.getId()) == 0){
-  	          s.pop();
-  	        }
-  	        visData.addLabel("Pushed " + min + " capacity on Edge");
-  	        visData.addNobeLabels(d);
-  	        visData.addNetwork(graph.copy());
-  	        visData.addNodeHighlight(null);
-  	        visData.addPath(Arrays.asList(getCurrentArc(v)));
+	    	  
+		        int w_id = getCurrentArc(v).getEnd().getId();
+		        if(w_id != graph.getStartNode().getId() && w_id != graph.getEndNode().getId() && getExcess(w_id) == 0){
+		  	       s.addLast(getCurrentArc(v).getEnd());
+	  	        }
+		        
+	  	        //Increase Flow over (v,w) by
+	  	        int min = Math.min(getExcess(v.getId()), getCurrentArc(v).getAvailableCapacity());
+	  	        getCurrentArc(v).addCapacity(min);
+	  	        //Increase Excess of w by min and decrease excess of f by that value
+	  	        increaseExcess(w_id, min);
+	  	        decreaseExcess(v.getId(), min);
+	  	        
+	  	        if(getExcess(v.getId()) == 0){
+	  	        	s.pop();
+	  	        }
+	  	        if(visualization){
+		  	        visData.addLabel("Pushed " + min + " capacity on Edge");
+		  	        visData.addNobeLabels(d);
+		  	        visData.addNetwork(graph.copy());
+		  	        visData.addNodeHighlight(null);
+		  	        visData.addPath(Arrays.asList(getCurrentArc(v)));
+		  	        visData.addCut(findCut());
+	  	        }
 	      }else{
-	        int dmin = getMinD(v);
-	        visData.addLabel("Relabeled Node from " + d[v.getId()] + " to " + (dmin+1));
-	        d[v.getId()] = dmin +1;
-	        resetCurrentArc(v); 
-	        visData.addNetwork(graph.copy());
-	        visData.addNobeLabels(d);
-	        visData.addNodeHighlight(v);
-	        visData.addPath(new ArrayList<Edge>());
+		        int dmin = getMinD(v);
+		        if(visualization){
+			        visData.addLabel("Relabeled Node from " + d[v.getId()] + " to " + (dmin+1));
+		        }
+		        d[v.getId()] = dmin +1;
+		        resetCurrentArc(v); 
+		        
+		        if(visualization){
+		        	visData.addNetwork(graph.copy());
+			        visData.addNobeLabels(d);
+			        visData.addNodeHighlight(v);
+			        visData.addPath(new ArrayList<Edge>());
+			        visData.addCut(findCut());
+		        }
 	      }
 	    }
+	}
+	
+	private List<Node> findCut(){
+		BFSAll bfs = new BFSAll(graph);
+		return bfs.run();
 	}
 	
 	private int getMinD(Node v){

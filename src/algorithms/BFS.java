@@ -17,7 +17,6 @@ public class BFS {
 	
 	//DINIC SPEZIELL
 	private int[] level;
-	//Jede Node gibt an welche Edges sie hat => edgesForNode[3][4][5] == true => Node 3 hat Edge von Node 4 zu Node 5
 	private LinkedList<Edge>[] edgesForNode;
 	
 	
@@ -80,12 +79,10 @@ public class BFS {
 		graph.getNodes()
 				.stream()
 				.forEach(x -> {
-					visited[x.getId()] = false;
-					currentArc[x.getId()] = 0;
 					level[x.getId()] = Integer.MAX_VALUE;
 					edgesForNode[x.getId()] = new LinkedList<Edge>();});
 		visited[graph.getStartNode().getId()] = true;
-    level[graph.getStartNode().getId()] = 0;
+		level[graph.getStartNode().getId()] = 0;
 	}
 	
 	private void iterate(){	
