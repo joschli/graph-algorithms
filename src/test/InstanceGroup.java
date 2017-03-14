@@ -9,7 +9,7 @@ import model.Network;
 public class InstanceGroup {
 
 	private List<Network> instances;
-	private Map<Network, InstanceResult> instanceToResult;
+	private Map<Network, List<InstanceResult>> instanceToResult;
 
 	public InstanceGroup(List<Network> instances) {
 		this.instances = instances;
@@ -20,7 +20,7 @@ public class InstanceGroup {
 		return instances;
 	}
 
-	public void save(Network instance, InstanceResult result) {
+	public void save(Network instance, List<InstanceResult> result) {
 		instanceToResult.put(instance, result);
 	}
 

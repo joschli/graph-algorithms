@@ -101,8 +101,8 @@ public class Network {
 		getEdgePairs().stream().forEach(e -> copy.addEdgePair(e.clone()));
 		copy.getEdgePairs().stream().map(x -> Arrays.asList(x.fwEdge.getStart(), x.fwEdge.getEnd()))
 				.flatMap(x -> x.stream()).distinct().forEach(x -> copy.addNode(x));
-		copy.setStartNode(this.startNode);
-		copy.setEndNode(this.endNode);
+		copy.setStartNode(this.startNode.clone());
+		copy.setEndNode(this.endNode.clone());
 		copy.calculateEdgesForNode();
 		return copy;
 	}

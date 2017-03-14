@@ -103,10 +103,12 @@ public class GraphGenerator {
 	private boolean finalizeGraph(Network graph, int maxCapacity) {
 		setStartNode(graph);
 		setEndNode(graph);
-		if (setEdgeDirections(graph)) {
+		distributeCapacities(graph, maxCapacity);
+		if (!setEdgeDirections(graph)) {
 			return false;
 		}
 		int tryCount = 0;
+		
 		while (!validCapacityDistribution(graph)) {
 			if (tryCount == 5) {
 				return false;
@@ -120,7 +122,6 @@ public class GraphGenerator {
 	}
 
 	private boolean setEdgeDirections(Network graph) {
-
 		for (EdgePair pair : graph.getEdgePairsForNode(graph.getStartNode())) {
 			if (!graph.getStartNode().equals(pair.fwEdge.getStart())) {
 				pair.invert();
@@ -134,9 +135,9 @@ public class GraphGenerator {
 		}
 
 		changeEdgeDirections(graph);
-		if (!validNodes(graph)) {
+		/*if(!validNodes(graph)){
 			return false;
-		}
+		}*/
 		BFSAll bfs = new BFSAll(graph);
 		List<Node> reachableNodes = bfs.run();
 		return reachableNodes.size() == graph.getNodes().size();
@@ -203,32 +204,33 @@ public class GraphGenerator {
 	}
 
 	private boolean validCapacityDistribution(Network graph) {
-		Network clonedGraph = cloneGraph(graph);
+		Network clonedGraph = graph.copy();
 		clonedGraph.calculateEdgesForNode();
 		List<EdgePair> fullEdges = checkIndicentEdges(clonedGraph);
 		if (fullEdges.isEmpty()) {
 			return true;
 		}
 
-		int maxFlow = calcMaxFlow(fullEdges, graph);
+		int maxFlow = calcMaxFlow(clonedGraph);
 		clonedGraph.clearCapacities();
 		for (EdgePair edgePair : fullEdges) {
-			clonedGraph.getEdgePairs().stream().filter((e) -> e.equals(edgePair)).collect(Collectors.toList()).get(0)
-					.setCapacity(edgePair.getCapacity() - 1);
-			int newMaxFlow = calcMaxFlow(checkIndicentEdges(clonedGraph), graph);
+			edgePair.setCapacity(edgePair.getMaxCapacity()-1);
+			FordFulkerson f = new FordFulkerson(clonedGraph);
+			f.run();
+			int newMaxFlow = calcMaxFlow(f.getGraph());
 			clonedGraph.clearCapacities();
 			if (newMaxFlow != maxFlow) {
 				return false;
 			}
 		}
 
-		return false;
+		return true;
 
 	}
 
-	private int calcMaxFlow(List<EdgePair> fullEdges, Network graph) {
+	private int calcMaxFlow(Network graph) {
 		int maxFlow = 0;
-		for (EdgePair pair : fullEdges.stream().filter((e) -> e.contains(graph.getStartNode()))
+		for (EdgePair pair : graph.getEdgePairs().stream().filter((e) -> e.contains(graph.getStartNode()))
 				.collect(Collectors.toList())) {
 			maxFlow += pair.getAvailableCapacity(false);
 		}
