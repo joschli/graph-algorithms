@@ -8,5 +8,6 @@ public abstract class AbstractMaxFlowAlgorithm {
 	
 	public abstract List<EdgePair> run();
 
+	public abstract String getName();
 	
 }

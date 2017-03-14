@@ -1,6 +1,7 @@
 package algorithms;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import model.Edge;
@@ -16,6 +17,10 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 		this.g = g;
 	}
 
+	@Override 
+	public String getName(){
+		return "Dinic";
+	}
 	@Override
 	public List<EdgePair> run() {
 		init();
@@ -43,6 +48,7 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 	}
 	// O(m*n) => m iterationen (Anzahl Edges, dajedes mal edges weniger werden) Dfs O(n) mit Nodebedingung
 	private void createAndAddBlockingFlow(List<Edge> subGraph){
+		LinkedList<Edge> secondaryHighlight = new LinkedList<Edge>();
 		SimpleGraph sg = new SimpleGraph(subGraph, g.getStartNode(), g.getEndNode());
 		while (true) {
 			DFSForDinic dfs = new DFSForDinic(sg);
@@ -52,10 +58,12 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 			}
 			int minCapacity = dfs.getAvailableCapacity();
 			path.stream().forEach(x -> {
+				secondaryHighlight.addFirst(x);
 				x.addCapacity(minCapacity);
 				sg.removeEdge(x);
 			});
 		}
+		data.addSecondaryHighlight(secondaryHighlight);
 
 	}
 

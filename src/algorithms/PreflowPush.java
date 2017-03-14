@@ -21,6 +21,11 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	public PreflowPush(Network g) {
 		this.graph = g;
 	}
+	
+	@Override 
+	public String getName(){
+		return "Preflow-Push";
+	}
 
 	@Override
 	public List<EdgePair> run() {
@@ -30,37 +35,37 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	}
 	
 	private void init(){
-	  currentArc = new int[graph.getHighestIndex()+1];
+		currentArc = new int[graph.getHighestIndex()+1];
 		d = new int[graph.getHighestIndex()+1];
 		s = new LinkedList<Node>();
-	  excess = new int[graph.getHighestIndex()+1];
+		excess = new int[graph.getHighestIndex()+1];
 	  
 		//Compute Valid Distance Labeling with BFS
 		d = computeValidDistanceLabeling();
 		d[graph.getStartNode().getId()] = graph.getNodes().size();
 		d[graph.getEndNode().getId()] = 0;
-    graph.getNodes()
-            .stream()
-            .forEach(x -> {
-                    currentArc[x.getId()]= 0;
-                    excess[x.getId()]= 0;
-                  });
+		graph.getNodes()
+	        .stream()
+	        .forEach(x -> {
+	                currentArc[x.getId()]= 0;
+	                excess[x.getId()]= 0;
+	              });
 	
-    graph.getEdgePairs().stream().forEach(e -> e.clearCapacity());
-    graph.getEdgesForNode(graph.getStartNode())
-        .stream()
-        .forEach(edge ->{
-                  increaseExcess(edge.getEnd().getId(), edge.getAvailableCapacity());
-                  edge.addCapacity(edge.getAvailableCapacity());
-                  s.addFirst(edge.getEnd());
-                });
+		graph.getEdgePairs().stream().forEach(e -> e.clearCapacity());
+		graph.getEdgesForNode(graph.getStartNode())
+	    .stream()
+	    .forEach(edge ->{
+	              increaseExcess(edge.getEnd().getId(), edge.getAvailableCapacity());
+	              edge.addCapacity(edge.getAvailableCapacity());
+	              s.addFirst(edge.getEnd());
+	            });
 	}
 	
 	
 	
 	private int[] computeValidDistanceLabeling(){
-	  BFSPreflowPush bfs = new BFSPreflowPush(graph, graph.getEndNode());
-	  return bfs.run();
+		BFSPreflowPush bfs = new BFSPreflowPush(graph, graph.getEndNode());
+		return bfs.run();
 	}
 	
 	private void iterate(){
@@ -92,39 +97,39 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	
 	//TODO: OPTIMIERUNG??
 	private int getMinD(Node v){
-	  return graph.getEdgesForNode(v).stream().map(x -> {return x.getAvailableCapacity()!=0 ? d[x.getEnd().getId()]: Integer.MAX_VALUE;}).min(Integer::compare).get();
+		return graph.getEdgesForNode(v).stream().map(x -> {return x.getAvailableCapacity()!=0 ? d[x.getEnd().getId()]: Integer.MAX_VALUE;}).min(Integer::compare).get();
 	}
 	
 	private boolean isAdmissible(Edge e){
-	  return d[e.getStart().getId()] == d[e.getEnd().getId()] +1;
+		return d[e.getStart().getId()] == d[e.getEnd().getId()] +1;
 	}
 	
 	private void increaseExcess(int id, int amount){
-	  excess[id] = excess[id] +amount;
+		excess[id] = excess[id] +amount;
 	}
 	
 	private void decreaseExcess(int id, int amount){
-	  excess[id] = excess[id] - amount;
+		excess[id] = excess[id] - amount;
 	}
 	
 	private int getExcess(int id){
-	  return excess[id];
+		return excess[id];
 	}
 	
-  private Edge getCurrentArc(Node n){
-    if(graph.getEdgesForNode(n).size() > currentArc[n.getId()]){
-      return graph.getEdgesForNode(n).get(currentArc[n.getId()]);
-    }else{
-      return null;
-    } 
-  }
+	private Edge getCurrentArc(Node n){
+	  if(graph.getEdgesForNode(n).size() > currentArc[n.getId()]){
+		  return graph.getEdgesForNode(n).get(currentArc[n.getId()]);
+	  }else{
+		  return null;
+	  } 
+	}
 
- private void increaseCurrentArc(Node n){
+	private void increaseCurrentArc(Node n){
       currentArc[n.getId()] = currentArc[n.getId()] +1;
- }
+	}
   
-  private void resetCurrentArc(Node n){
-    currentArc[n.getId()] =0;
-  }
+	 private void resetCurrentArc(Node n){
+	  currentArc[n.getId()] =0;
+	 }
 
 }

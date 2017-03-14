@@ -16,6 +16,11 @@ public class EdmondsKarp extends AbstractMaxFlowAlgorithm {
 		this.g = g;
 	}
 	
+	@Override 
+	public String getName(){
+		return "Edmonds-Karp";
+	}
+	
 	@Override
 	public List<EdgePair> run() {
 		init();

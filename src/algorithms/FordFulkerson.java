@@ -17,6 +17,11 @@ public class FordFulkerson extends AbstractMaxFlowAlgorithm {
 		this.g = g;
 	}
 	
+	@Override 
+	public String getName(){
+		return "Ford-Fulkerson";
+	}
+	
 	@Override
 	public List<EdgePair> run() {
 		init();
