@@ -28,6 +28,9 @@ public class PathExists {
 		init();
 		while (!nodes.isEmpty()) {
 			Pair<Node, Integer> u = getNextPair();
+			if (u.getRight() == Integer.MAX_VALUE) {
+				break;
+			}
 			if (u.getLeft().equals(goal)) {
 				return u.getRight() < Integer.MAX_VALUE;
 			}
@@ -51,7 +54,7 @@ public class PathExists {
 	}
 
 	private void updateDistances(Pair<Node, Integer> u, Node v) {
-		int dist = distances.get(0).getRight() + 1;
+		int dist = u.getRight() + 1;
 		int idx = getPair(v);
 		if (distances.get(idx).getRight() > dist) {
 			distances.remove(idx);

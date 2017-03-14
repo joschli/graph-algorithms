@@ -1,9 +1,12 @@
 
+
 import java.util.Arrays;
 
+import generator.GraphGenerator;
 import model.EdgePair;
 import model.Network;
 import model.Node;
+import test.TimedExecution;
 import ui.MainFrame;
 
 public class Main {
@@ -53,18 +56,12 @@ public class Main {
 		 * e.printFlow(flow2);
 		 */
 		/*GraphGenerator generator = new GraphGenerator(10000, 10000, false);
-		TimedExecution exec = new TimedExecution((nodes) -> generator.generateGraph(100, 5));
-		List<Long> runTimes = new ArrayList<>();
-		for (int i = 0; i < 20; i++) {
-			runTimes.add(exec.run(null));
-		}
-		double sum = runTimes.stream().reduce((long) 0, (a, b) -> a + b);
-		double avg = sum / runTimes.size();
-		System.out.println(avg);*/
+		TimedExecution exec = new TimedExecution((nodes) -> generator.generateGraph(100, 5));*/
+		// System.out.println(exec.run(1000));
 		// Dinic d = new Dinic(g);
 		// List<EdgePair> flow = d.run();
 		// Network.printFlow(flow);
 
-		 MainFrame frame = new MainFrame(1600, 1200);
+		MainFrame frame = new MainFrame(1600, 1200);
 	}
 }

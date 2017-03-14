@@ -50,11 +50,11 @@ public class MenuPanel extends JPanel {
 		algorithmSelection.addActionListener(parent);
 		JLabel nodeCountLabel = new JLabel("Nodes:");
 		nodeCountField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-		nodeCountField.setValue(new Long(5));
+		nodeCountField.setValue(new Long(10));
 		nodeCountField.setColumns(3);
 		JLabel capacityLabel = new JLabel("Capacity:");
 		capacityField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-		capacityField.setValue(new Long(5));
+		capacityField.setValue(new Long(10));
 		capacityField.setColumns(3);
 
 		nodeCountPanel = new JPanel();
