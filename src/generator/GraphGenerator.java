@@ -28,9 +28,7 @@ public class GraphGenerator {
 
 	public List<Network> generateGraph(int nodeCount, int graphCapacity) {
 		List<Network> graphs = generateGraph(nodeCount);
-
-		while ((displayable && !checkEdges(lastGraph(graphs)))
-				|| !distributeCapacities(lastGraph(graphs), graphCapacity)) {
+		while ((displayable && !checkEdges(lastGraph(graphs)) || !finalizeGraph(lastGraph(graphs), graphCapacity))) {
 			graphs = generateGraph(nodeCount);
 		}
 
@@ -100,9 +98,70 @@ public class GraphGenerator {
 		return clone;
 	}
 
-	private boolean distributeCapacities(Network graph, int maxCapacity) {
-		Node min = null;
+	private boolean finalizeGraph(Network graph, int maxCapacity) {
+		setStartNode(graph);
+		setEndNode(graph);
+		if (!validNodePlacement(graph)) {
+			return false;
+		}
+
+		int tryCount = 0;
+		while (!validCapacityDistribution(graph)) {
+			if (tryCount == 5) {
+				return false;
+			}
+
+			distributeCapacities(graph, maxCapacity);
+			tryCount++;
+		}
+
+		return true;
+	}
+
+	private void distributeCapacities(Network graph, int maxCapacity) {
+		List<Integer> capacities = new ArrayList<>();
+		for (int i = 0; i < graph.getEdgePairs().size(); i++) {
+			capacities.add(getRandomCap(maxCapacity));
+		}
+
+		for (int i = 0; i < graph.getEdgePairs().size(); i++) {
+			graph.getEdgePairs().get(i).setCapacity(capacities.get(i));
+		}
+	}
+
+	private boolean validCapacityDistribution(Network graph) {
+		graph.calculateEdgesForNode();
+		boolean valid = checkIndicentEdges(graph);
+		graph.clearCapacities();
+		return valid;
+	}
+
+	private boolean validNodePlacement(Network graph) {
+		if (graph.getStartNode().equals(graph.getEndNode())) {
+			return false;
+		}
+		if (graph.getNeighbors(graph.getStartNode()).contains(graph.getEndNode())) {
+			return false;
+		}
+		return checkIfConnected(graph);
+	}
+
+	private void setEndNode(Network graph) {
 		Node max = null;
+		for (Node n : graph.getNodes()) {
+			if (max == null && !n.equals(graph.getStartNode())) {
+				max = n;
+			}
+			if (max != null && n.getPoint().getX() > max.getPoint().getX()
+					&& n.getPoint().getY() < max.getPoint().getY()) {
+				max = n;
+			}
+		}
+		graph.setEndNode(max);
+	}
+
+	private void setStartNode(Network graph) {
+		Node min = null;
 		for (Node n : graph.getNodes()) {
 			if (min == null) {
 				min = n;
@@ -111,49 +170,7 @@ public class GraphGenerator {
 				min = n;
 			}
 		}
-		for (Node n : graph.getNodes()) {
-			if (max == null && !n.equals(min)) {
-				max = n;
-			}
-			if (max != null && n.getPoint().getX() > max.getPoint().getX()
-					&& n.getPoint().getY() < max.getPoint().getY()) {
-				max = n;
-			}
-		}
-
-		assert (!min.equals(max));
 		graph.setStartNode(min);
-		graph.setEndNode(max);
-
-		if (!checkIfConnected(graph) && !graph.getNeighbors(graph.getStartNode()).contains(graph.getEndNode())) {
-			return false;
-		}
-
-		int tryCount = 0;
-		while (true) {
-
-			List<Integer> capacities = new ArrayList<>();
-			for (int i = 0; i < graph.getEdgePairs().size(); i++) {
-				capacities.add(getRandomCap(maxCapacity));
-			}
-
-			for (int i = 0; i < graph.getEdgePairs().size(); i++) {
-				graph.getEdgePairs().get(i).setCapacity(capacities.get(i));
-			}
-
-			graph.calculateEdgesForNode();
-
-			boolean valid = checkIndicentEdges(graph);
-			if (valid) {
-				break;
-			}
-			if (!valid || tryCount == 5) {
-				return false;
-			}
-			tryCount++;
-		}
-		graph.clearCapacities();
-		return true;
 	}
 
 	private boolean checkIndicentEdges(Network graph) {
