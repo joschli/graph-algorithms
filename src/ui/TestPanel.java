@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,6 +15,7 @@ import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -24,13 +27,18 @@ public class TestPanel extends JPanel implements ActionListener {
 
 	JButton startTest;
 	JComboBox<String> menu;
+	JButton openFile;
 	MainFrame parent;
 	JTextArea result;
+	final JFileChooser fc = new JFileChooser("./logs");
 
 	public TestPanel(MainFrame parent) {
 		String[] testsets = { "verysmall", "small", "medium", "large" };
 		menu = new JComboBox<>(testsets);
 		startTest = new JButton("Start");
+		openFile = new JButton("Open log");
+		openFile.addActionListener(this);
+		openFile.setActionCommand("openfile");
 		startTest.addActionListener(this);
 		result = new JTextArea("");
 		result.setEditable(false);
@@ -39,13 +47,24 @@ public class TestPanel extends JPanel implements ActionListener {
 		pane.setPreferredSize(new Dimension(800, 600));
 		this.add(startTest);
 		this.add(menu);
+		this.add(openFile);
 		this.add(pane);
 		this.parent = parent;
+
 		parent.packAndCenterFrame();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		if (arg0.getActionCommand().equals("openfile")) {
+			int returnVal = fc.showOpenDialog(this);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				openLog(file.toPath());
+			} else {
+			}
+			return;
+		}
 		result.setText("");
 		String testset = (String) menu.getSelectedItem();
 		result.setText("Waiting on results...");
@@ -72,8 +91,12 @@ public class TestPanel extends JPanel implements ActionListener {
 		String file = "test" + dateString(new Date()) + ".txt";
 
 		test.run(file);
+		openLog(Paths.get("./logs/" + file));
+	}
+
+	private void openLog(Path file) {
 		try {
-			String s = Files.readAllLines(Paths.get("./logs/" + file)).stream().reduce("", (a, b) -> a + "\n" + b);
+			String s = Files.readAllLines(file).stream().reduce("", (a, b) -> a + "\n" + b);
 			Color background = Color.green;
 			if (s.contains("NOT VALID")) {
 				background = Color.red;
