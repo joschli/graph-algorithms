@@ -162,9 +162,15 @@ public class MenuPanel extends JPanel {
 		stepLabel.setVisible(true);
 		backwardButton.setVisible(true);
 		forwardButton.setVisible(true);
+		disableMenu();
 	}
 
-	public void restart() {
+	private void disableMenu() {
+    generateButton.setEnabled(false);
+    startButton.setEnabled(false);
+  }
+
+  public void restart() {
 		generateButton.setVisible(true);
 		startButton.setVisible(true);
 		nodeCountPanel.setVisible(true);
@@ -178,6 +184,8 @@ public class MenuPanel extends JPanel {
 		stepLabel.setVisible(false);
 		backwardButton.setVisible(false);
 		forwardButton.setVisible(false);
+		generateButton.setEnabled(true);
+		startButton.setEnabled(true);
 	}
 
 	public void disableStart() {
@@ -221,5 +229,14 @@ public class MenuPanel extends JPanel {
 		this.maxSteps = maxSteps;
 		updateStepLabel();
 	}
+
+  public void disableAll() {
+    disablePrevious();
+    disableNext();
+    disableStart();
+    disablePause();
+  }
+  
+  
 
 }

@@ -91,7 +91,6 @@ public class MainFrame implements ActionListener {
 		index = 0;
 		GraphGenerator gen = new GraphGenerator(this.width * 2, this.height * 2, true);
 		networks = gen.generateGraph(menuPanel.getNodeCount(), menuPanel.getCapacity());
-		showGraph();
 	}
 
 	private void showGraph() {
@@ -185,8 +184,10 @@ public class MainFrame implements ActionListener {
 			if (visActivated) {
 				if (visData.isGoldbergTarjan()) {
 					return "<html><font color='white'><b>"
-							+ Integer.toString(visData.getNodeLabels().get(index)[n.getId()]) + "</b></font></html>";
+							+ Integer.toString(visData.getNodeLabels().get(index)[n.getId()]) +"</b></font></html>";
 				}
+			}else{
+			  return Integer.toString(n.getId());
 			}
 			return "";
 		});
@@ -236,10 +237,10 @@ public class MainFrame implements ActionListener {
 		visLabel = new JTextField("Generate a graph and use a specific algorithm to solve it!");
 		visLabel.setEditable(false);
 		visLabel.setBorder(null);
-		if (!visData.getLabels().isEmpty())
-
-		{
-			visLabel.setText(visData.getLabels().get(index));
+		if(visActivated){
+	    if (!visData.getLabels().isEmpty()){
+	      visLabel.setText(visData.getLabels().get(index));
+	    } 
 		}
 		graphPanel.add(visLabel);
 		frame.getContentPane().add(graphPanel, BorderLayout.CENTER);
@@ -279,7 +280,7 @@ public class MainFrame implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-
+	  System.out.println(e.getActionCommand());
 		switch (e.getActionCommand()) {
 		case "generate":
 			frame.getContentPane().remove(graphPanel);
@@ -305,12 +306,13 @@ public class MainFrame implements ActionListener {
 			menuPanel.enableStart();
 			break;
 		case "start":
-			menuPanel.start();
+			
 			if (menuPanel.getAlgorithm() == "zg") {
 				index = 0;
+				visActivated = true;
 			} else if (menuPanel.getAlgorithm().equals("EdmondsKarp")) {
-				networks.get(index).calculateEdgesForNode();
-				EdmondsKarp ek = new EdmondsKarp(networks.get(index));
+				networks.get(networks.size()-1).calculateEdgesForNode();
+				EdmondsKarp ek = new EdmondsKarp(networks.get(networks.size()-1).copy());
 				ek.setVisualization(true);
 				ek.run();
 				visData = ek.getVisData();
@@ -318,8 +320,8 @@ public class MainFrame implements ActionListener {
 				index = 0;
 				visActivated = true;
 			} else if (menuPanel.getAlgorithm().equals("FordFulkerson")) {
-				networks.get(index).calculateEdgesForNode();
-				FordFulkerson ff = new FordFulkerson(networks.get(index));
+				networks.get(networks.size()-1).calculateEdgesForNode();
+				FordFulkerson ff = new FordFulkerson(networks.get(networks.size()-1).copy());
 				ff.setVisualization(true);
 				ff.run();
 				visData = ff.getVisData();
@@ -327,8 +329,8 @@ public class MainFrame implements ActionListener {
 				index = 0;
 				visActivated = true;
 			} else if (menuPanel.getAlgorithm().equals("Dinic")) {
-				networks.get(index).calculateEdgesForNode();
-				Dinic d = new Dinic(networks.get(index));
+				networks.get(networks.size()-1).calculateEdgesForNode();
+				Dinic d = new Dinic(networks.get(networks.size()-1).copy());
 				d.setVisualization(true);
 				List<EdgePair> flow = d.run();
 				Network.printFlow(flow);
@@ -337,8 +339,8 @@ public class MainFrame implements ActionListener {
 				index = 0;
 				visActivated = true;
 			} else if (menuPanel.getAlgorithm().equals("GoldbergTarjan")) {
-				networks.get(index).calculateEdgesForNode();
-				PreflowPush pp = new PreflowPush(networks.get(index));
+				networks.get(networks.size()-1).calculateEdgesForNode();
+				PreflowPush pp = new PreflowPush(networks.get(networks.size()-1).copy());
 				pp.setVisualization(true);
 				pp.run();
 				visData = pp.getVisData();
@@ -349,6 +351,7 @@ public class MainFrame implements ActionListener {
 			menuPanel.setCurrentStep(index);
 			menuPanel.setMaxSteps(networks.size() - 1);
 			menuPanel.enableStart();
+			menuPanel.start();
 			showGraph();
 			break;
 		case "play":
@@ -392,8 +395,10 @@ public class MainFrame implements ActionListener {
 			break;
 		case "back":
 			menuPanel.restart();
-			index = networks.size() - 1;
+			index = 0;
 			visActivated = false;
+			visData = null;
+			menuPanel.disableAll();
 			showGraph();
 			break;
 
@@ -412,19 +417,21 @@ public class MainFrame implements ActionListener {
 		}
 		packAndCenterFrame();
 
-		if (index > 0) {
-			menuPanel.enablePrevious();
-		}
-		if (index < networks.size() - 1) {
-			menuPanel.enableNext();
-		}
-		if (index == 0) {
-			menuPanel.disablePrevious();
-		}
-		if (index >= networks.size() - 1) {
-			menuPanel.disableNext();
-			menuPanel.disableStart();
-			menuPanel.disablePause();
+		if(visActivated){
+	    if (index > 0) {
+	      menuPanel.enablePrevious();
+	    }
+	    if (index < networks.size() - 1) {
+	      menuPanel.enableNext();
+	    }
+	    if (index == 0) {
+	      menuPanel.disablePrevious();
+	    }
+	    if (index >= networks.size() - 1) {
+	      menuPanel.disableNext();
+	      menuPanel.disableStart();
+	      menuPanel.disablePause();
+	    } 
 		}
 
 	}

@@ -50,6 +50,7 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	
 	private void init(){
 		currentArc = new int[graph.getHighestIndex()+1];
+		System.out.println("HIGH INDEX:" + graph.getHighestIndex());
 		d = new int[graph.getHighestIndex()+1];
 		s = new LinkedList<Node>();
 		excess = new int[graph.getHighestIndex()+1];
@@ -142,6 +143,11 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	}
 	
 	private int getMinD(Node v){
+	  System.out.println("HIGHIDX: " + graph.getHighestIndex());
+	  System.out.println("NODE :" + v.getId());
+	  System.out.println("NODES: " + graph.getNodes().size());
+	  System.out.println("GETEDGESFORNODE: " + graph.getEdgesForNode(v).size());
+	  System.out.println("END: " + graph.getEndNode().getId());
 		return graph.getEdgesForNode(v).stream().map(x -> {return x.getAvailableCapacity()!=0 ? d[x.getEnd().getId()]: Integer.MAX_VALUE;}).min(Integer::compare).get();
 	}
 	
