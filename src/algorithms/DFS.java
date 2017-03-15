@@ -36,7 +36,6 @@ public class DFS {
 		
 		s.addFirst(graph.getStartNode());
 		availableCapacity.addFirst(Integer.MAX_VALUE);
-		graph.getNodes().stream().forEach(x -> { visited[x.getId()] = false; currentArc[x.getId()] = 0;});
 		visited[graph.getStartNode().getId()] = true;
 	}
 	

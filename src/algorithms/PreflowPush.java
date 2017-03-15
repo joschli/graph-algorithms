@@ -143,11 +143,6 @@ public class PreflowPush extends AbstractMaxFlowAlgorithm {
 	}
 	
 	private int getMinD(Node v){
-	  System.out.println("HIGHIDX: " + graph.getHighestIndex());
-	  System.out.println("NODE :" + v.getId());
-	  System.out.println("NODES: " + graph.getNodes().size());
-	  System.out.println("GETEDGESFORNODE: " + graph.getEdgesForNode(v).size());
-	  System.out.println("END: " + graph.getEndNode().getId());
 		return graph.getEdgesForNode(v).stream().map(x -> {return x.getAvailableCapacity()!=0 ? d[x.getEnd().getId()]: Integer.MAX_VALUE;}).min(Integer::compare).get();
 	}
 	

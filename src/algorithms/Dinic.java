@@ -66,12 +66,9 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 	private void createAndAddBlockingFlow(List<Edge> subGraph){
 		LinkedList<Edge> secondaryHighlight = new LinkedList<Edge>();
 		SimpleGraph sg = new SimpleGraph(subGraph, g.getStartNode(), g.getEndNode());
-		while (true) {
-			DFSForDinic dfs = new DFSForDinic(sg);
-			List<Edge> path = dfs.runDinic();
-			if (path.size() == 0) {
-				break;
-			}
+    DFSForDinic dfs = new DFSForDinic(sg);
+    List<Edge> path = dfs.runDinic();
+		while (path.size()>0) {
 			int minCapacity = dfs.getAvailableCapacity();
 			path.stream().forEach(x -> {
 				secondaryHighlight.addFirst(x);
@@ -86,6 +83,8 @@ public class Dinic extends AbstractMaxFlowAlgorithm {
 			data.addSecondaryHighlight(secondaryHighlight);
 		}
 
+		dfs = new DFSForDinic(sg);
+    path = dfs.runDinic();
 	}
 
 

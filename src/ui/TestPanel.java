@@ -98,7 +98,7 @@ public class TestPanel extends JPanel implements ActionListener {
 		try {
 			String s = Files.readAllLines(file).stream().reduce("", (a, b) -> a + "\n" + b);
 			Color background = Color.green;
-			if (s.contains("NOT VALID")) {
+			if (s.contains("NOT VALID") || s.contains("FAILURE")) {
 				background = Color.red;
 			}
 			result.setText("Test saved in: " + file + "\n" + s);
