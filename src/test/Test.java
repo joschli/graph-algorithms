@@ -40,11 +40,11 @@ public class Test {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file.toFile(), true));
 			BufferedWriter testW = new BufferedWriter(new FileWriter(testFile.toFile(), true));
-		
+
 			for (Triplet t : triplets) {
 				instances.add(generateInstances(t));
 			}
-	
+
 			int groupId = 0;
 			int instanceId = 0;
 			for (InstanceGroup group : instances) {
@@ -61,7 +61,7 @@ public class Test {
 						algoResults.add(res);
 					}
 					checkResultEquality(algoResults);
-					group.save(instance,algoResults);
+					group.save(instance, algoResults);
 					log(bw, groupId, instanceId, algoResults);
 					instanceId++;
 				}
@@ -69,10 +69,11 @@ public class Test {
 			}
 		} catch (IOException e) {
 		}
-		
+
 	}
-	
-	private void log(BufferedWriter bw, int groupId, int instanceId, List<InstanceResult> algoResults) throws IOException{
+
+	private void log(BufferedWriter bw, int groupId, int instanceId, List<InstanceResult> algoResults)
+			throws IOException {
 		bw.newLine();
 		bw.write("-------------------------------------------------------------------------------------");
 		bw.newLine();
@@ -82,16 +83,16 @@ public class Test {
 		bw.newLine();
 		bw.write("INSTANCE: " + instanceId);
 		bw.newLine();
-		for(InstanceResult res : algoResults){
+		for (InstanceResult res : algoResults) {
 			bw.write("ALGORITHM: " + res.algorithm);
 			bw.newLine();
-			if(res.isValid()){
+			if (res.isValid()) {
 				bw.write("NO ERRORS - VALID");
 				bw.newLine();
-			}else{
+			} else {
 				bw.write("ERRORS:" + res.errors.size() + " - NOT VALID");
 				bw.newLine();
-				for(FlowError e : res.errors){
+				for (FlowError e : res.errors) {
 					bw.write(e.name);
 					bw.newLine();
 				}
@@ -99,80 +100,89 @@ public class Test {
 		}
 		bw.flush();
 	}
-	
-	private void checkResultEquality(List<InstanceResult> res){
-		if(res.stream().map(x -> getFlow(x.instance)).distinct().collect(Collectors.toList()).size() != 1){
+
+	private void checkResultEquality(List<InstanceResult> res) {
+		if (res.stream().map(x -> getFlow(x.instance)).distinct().collect(Collectors.toList()).size() != 1) {
 			res.stream().forEach(x -> x.addError(FlowError.createDifferentResultError()));
 		}
 	}
-	
-	private int getFlow(Network n){
-		int outflowStart = n.getEdgePairs().stream().filter(x ->  (x.fwEdge.getStart().getId() == n.getStartNode().getId())).map(x -> x.getCapacity()).reduce(0, Integer::sum);
+
+	private int getFlow(Network n) {
+		int outflowStart = n.getEdgePairs().stream()
+				.filter(x -> (x.fwEdge.getStart().getId() == n.getStartNode().getId())).map(x -> x.getCapacity())
+				.reduce(0, Integer::sum);
 		return outflowStart;
 	}
 
-	private void checkResultForValidity(InstanceResult result){
+	private void checkResultForValidity(InstanceResult result) {
 		checkFlowConstraints(result);
 		checkCapacityConstraints(result);
 		checkSaturatedCut(result);
 	}
-	
+
 	private void checkSaturatedCut(InstanceResult result) {
 		BFSAll bfs = new BFSAll(result.instance);
-		if(bfs.run().contains(result.instance.getEndNode())){
+		if (bfs.run().contains(result.instance.getEndNode())) {
 			result.addError(FlowError.createSaturatedCutError());
 		}
 	}
 
 	private void checkCapacityConstraints(InstanceResult result) {
 		List<EdgePair> edges = result.instance.getEdgePairs();
-		if(edges.stream().anyMatch(x -> (x.getCapacity() > x.getMaxCapacity() || x.getCapacity() < 0))){
+		if (edges.stream().anyMatch(x -> (x.getCapacity() > x.getMaxCapacity() || x.getCapacity() < 0))) {
 			result.addError(FlowError.createCapacityError());
 		}
 	}
 
-	private void checkFlowConstraints(InstanceResult result) {		
+	private void checkFlowConstraints(InstanceResult result) {
 		List<EdgePair> edges = result.instance.getEdgePairs();
 
-		int outflowStart = edges.stream().filter(x ->  (x.fwEdge.getStart().getId() == result.instance.getStartNode().getId())).map(x -> x.getCapacity()).reduce(0, Integer::sum);
-		int inflowEnd = edges.stream().filter(x ->  (x.fwEdge.getEnd().getId() == result.instance.getEndNode().getId())).map(x -> x.getCapacity()).reduce(0, Integer::sum);
-		if(outflowStart != inflowEnd){
+		int outflowStart = edges.stream()
+				.filter(x -> (x.fwEdge.getStart().getId() == result.instance.getStartNode().getId()))
+				.map(x -> x.getCapacity()).reduce(0, Integer::sum);
+		int inflowEnd = edges.stream().filter(x -> (x.fwEdge.getEnd().getId() == result.instance.getEndNode().getId()))
+				.map(x -> x.getCapacity()).reduce(0, Integer::sum);
+		if (outflowStart != inflowEnd) {
 			result.addError(FlowError.createFlowConstraintStartError());
 			return;
 		}
-		
-		for(Node n : result.instance.getNodes()){
-			if(n.getId() != result.instance.getStartNode().getId() && n.getId() != result.instance.getEndNode().getId()){
-				//Einfluss = Ausfluss
-				int inflow = edges.stream().filter(x ->  (x.fwEdge.getEnd().getId() == n.getId())).map(x -> x.getCapacity()).reduce(0, Integer::sum);
-				int outflow = edges.stream().filter(x ->  (x.fwEdge.getStart().getId() == n.getId())).map(x -> x.getCapacity()).reduce(0, Integer::sum);
-				if(inflow != outflow){
+
+		for (Node n : result.instance.getNodes()) {
+			if (n.getId() != result.instance.getStartNode().getId()
+					&& n.getId() != result.instance.getEndNode().getId()) {
+				// Einfluss = Ausfluss
+				int inflow = edges.stream().filter(x -> (x.fwEdge.getEnd().getId() == n.getId()))
+						.map(x -> x.getCapacity()).reduce(0, Integer::sum);
+				int outflow = edges.stream().filter(x -> (x.fwEdge.getStart().getId() == n.getId()))
+						.map(x -> x.getCapacity()).reduce(0, Integer::sum);
+				if (inflow != outflow) {
 					result.addError(FlowError.createFlowConstraintError());
 					return;
 				}
 			}
 		}
-		
+
 	}
 
-	private void checkTestEnvironment(InstanceResult res, BufferedWriter testW, int groupId, int instanceId) throws IOException{
+	private void checkTestEnvironment(InstanceResult res, BufferedWriter testW, int groupId, int instanceId)
+			throws IOException {
 		String s = "";
-		if(checkCapacityTest(res)){
+		if (checkCapacityTest(res)) {
 			s += "CAPACITY TEST: SUCCESS |";
-		}else{
+		} else {
 			s += "CAPACITY TEST: FAILURE |";
 		}
-		if(checkFlowTest(res)){
+		if (checkFlowTest(res)) {
 			s += "FLOW TEST: SUCCESS |";
-		}else{
+		} else {
 			s += "FLOW TEST: FAILURE |";
 		}
-		if(checkSatCutTest(res)){
+		if (checkSatCutTest(res)) {
 			s += "SAT CUT TEST: SUCCESS |";
-		}else{
+		} else {
 			s += "SAT CUT TEST: FAILURE";
 		}
-		
+
 		testW.newLine();
 		testW.write("-------------------------------------------------");
 		testW.newLine();
@@ -192,7 +202,7 @@ public class Test {
 		InstanceResult testInstance = new InstanceResult(res.algorithm, res.result, res.instance.copy());
 		testInstance.instance.getEdgePairs().stream().forEach(x -> x.setActualCapacity(0));
 		checkSaturatedCut(testInstance);
-		if(!testInstance.isValid()){
+		if (!testInstance.isValid()) {
 			return true;
 		}
 		return false;
@@ -200,23 +210,25 @@ public class Test {
 
 	private boolean checkFlowTest(InstanceResult res) {
 		InstanceResult testInstance = new InstanceResult(res.algorithm, res.result, res.instance.copy());
-		int randomIndex = ((int) (Math.random()*(testInstance.instance.getEdgePairs().size()-3)))+1;
+		int randomIndex = ((int) (Math.random() * (testInstance.instance.getEdgePairs().size() - 3))) + 1;
 		int cap = testInstance.instance.getEdgePairs().get(randomIndex).getCapacity();
-		testInstance.instance.getEdgePairs().get(randomIndex).setActualCapacity(cap+1);;
-		
+		testInstance.instance.getEdgePairs().get(randomIndex).setActualCapacity(cap + 1);
+		;
+
 		checkFlowConstraints(testInstance);
-		if(!testInstance.isValid()){
+		if (!testInstance.isValid()) {
 			return true;
 		}
 		return false;
 	}
 
-	private boolean checkCapacityTest(InstanceResult res ) {
+	private boolean checkCapacityTest(InstanceResult res) {
 		InstanceResult testInstance = new InstanceResult(res.algorithm, res.result, res.instance.copy());
-		EdgePair capError = testInstance.instance.getEdgePairs().get((int) (Math.random()*(testInstance.instance.getEdgePairs().size()-1)));
-		capError.setActualCapacity(capError.getMaxCapacity()+1);
+		EdgePair capError = testInstance.instance.getEdgePairs()
+				.get((int) (Math.random() * (testInstance.instance.getEdgePairs().size() - 1)));
+		capError.setActualCapacity(capError.getMaxCapacity() + 1);
 		checkCapacityConstraints(testInstance);
-		if(!testInstance.isValid()){
+		if (!testInstance.isValid()) {
 			return true;
 		}
 		return false;
@@ -225,6 +237,7 @@ public class Test {
 	private InstanceGroup generateInstances(Triplet t) {
 		List<Network> instances = new ArrayList<>();
 		for (int i = 0; i < t.instances; i++) {
+			System.out.println(i);
 			List<Network> networkProcess = generator.generateGraph(t.nodes, t.capacity);
 			instances.add(networkProcess.get(networkProcess.size() - 1));
 		}

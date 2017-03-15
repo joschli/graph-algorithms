@@ -78,8 +78,7 @@ public class TestPanel extends JPanel implements ActionListener {
 			if (s.contains("NOT VALID")) {
 				background = Color.red;
 			}
-			result.setText("Test saved in: " + file + "\n"
-					+ s);
+			result.setText("Test saved in: " + file + "\n" + s);
 			result.setBackground(background);
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -27,6 +27,30 @@ public class TestFactory {
 		return new Test(triplets);
 	}
 
+	public static Test createMediumBigTestCase() {
+		List<Triplet> triplets = new ArrayList<>();
+		triplets.add(new Triplet(1000, 10, 20));
+		return new Test(triplets);
+	}
+
+	public static Test createMediumBigTestCase1() {
+		List<Triplet> triplets = new ArrayList<>();
+		triplets.add(new Triplet(1000, 15, 20));
+		return new Test(triplets);
+	}
+
+	public static Test createMediumBigTestCase2() {
+		List<Triplet> triplets = new ArrayList<>();
+		triplets.add(new Triplet(500, 20, 20));
+		return new Test(triplets);
+	}
+
+	public static Test createMediumBigTestCase3() {
+		List<Triplet> triplets = new ArrayList<>();
+		triplets.add(new Triplet(500, 25, 20));
+		return new Test(triplets);
+	}
+
 	public static Test createBigTestCase() {
 		List<Triplet> triplets = new ArrayList<>();
 		triplets.add(new Triplet(100, 100, 1000));

@@ -31,7 +31,7 @@ public class GraphGenerator {
 
 	public List<Network> generateGraph(int nodeCount, int graphCapacity) {
 		List<Network> graphs = generateGraph(nodeCount);
-		while ((displayable && !checkEdges(lastGraph(graphs)) || !finalizeGraph(lastGraph(graphs), graphCapacity))) {
+		while ((displayable && !checkEdges(lastGraph(graphs))) || !finalizeGraph(lastGraph(graphs), graphCapacity)) {
 			graphs = generateGraph(nodeCount);
 		}
 
@@ -115,9 +115,9 @@ public class GraphGenerator {
 			if (tryCount == 5) {
 				return false;
 			}
-			if(tryCount == 0 && increaseStartCapacities){
+			if (tryCount == 0 && increaseStartCapacities) {
 				distributeIncreasedCapacities(graph, maxCapacity);
-			}else{
+			} else {
 				distributeCapacities(graph, maxCapacity);
 			}
 			tryCount++;
@@ -207,8 +207,8 @@ public class GraphGenerator {
 			graph.getEdgePairs().get(i).setCapacity(capacities.get(i));
 		}
 	}
-	
-	private void distributeIncreasedCapacities(Network graph, int maxCapacity){
+
+	private void distributeIncreasedCapacities(Network graph, int maxCapacity) {
 		graph.getEdgePairsForNode(graph.getStartNode()).stream().forEach(x -> x.setCapacity(maxCapacity));
 		graph.getEdgePairsForNode(graph.getEndNode()).stream().forEach(x -> x.setCapacity(maxCapacity));
 	}
